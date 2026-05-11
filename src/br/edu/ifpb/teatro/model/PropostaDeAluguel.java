@@ -8,7 +8,8 @@ import static java.lang.System.currentTimeMillis;
 
 public class PropostaDeAluguel {
 
-    private long id = currentTimeMillis();
+    // nao sei como acessar quando o main me pede o id, ent vou colocar com incrementação e depois eu coloco o currentTimeMillis
+    private long id = 0; //currentTimeMillis();
     private LocalDate dataDeCadastro;
     private LocalDate dataDeInicioDoAluguel;
     private LocalDate dataDeFimDoAluguel;
@@ -25,6 +26,7 @@ public class PropostaDeAluguel {
         this.valorTotalDoAluguel = valorTotalDoAluguel;
         this.locatario = locatario;
         this.status = PropostaDeAluguelStatus.EM_AVALIACAO;
+        this.id ++;
     }
 
     public LocalDate getDataDeCadastro() {

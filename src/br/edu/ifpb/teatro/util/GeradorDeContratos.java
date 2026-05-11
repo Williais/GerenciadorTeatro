@@ -31,7 +31,7 @@ public class GeradorDeContratos {
             documento.add(new Paragraph(" "));
 
             documento.add(new Paragraph("Nome da Peça: " + p.getNomeDaPeca()));
-            documento.add(new Paragraph("Locatário" + p.getLocatario().getNome()));
+            documento.add(new Paragraph("Locatário: " + p.getLocatario().getNome()));
             documento.add(new Paragraph("CPF do Locatário: " + p.getLocatario().getCpf())); //seria bom a gente fazer a validação do cpf depois para ser um adicionar para nosso projeto
             documento.add(new Paragraph("Valor do Aluguel: R$ " + p.getValorTotalDoAluguel()));
             documento.add(new Paragraph("Data de Início: " + p.getDataDeInicioDoAluguel()));

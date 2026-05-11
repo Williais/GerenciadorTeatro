@@ -2,7 +2,14 @@ package br.edu.ifpb.teatro.view;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
+import br.edu.ifpb.teatro.enums.PessoaSexo;
+import br.edu.ifpb.teatro.enums.PropostaDeAluguelStatus;
+import br.edu.ifpb.teatro.model.Pessoa;
+import br.edu.ifpb.teatro.model.PropostaDeAluguel;
+import br.edu.ifpb.teatro.util.GeradorDeContratos;
+import br.edu.ifpb.teatro.util.Mensageiro;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
@@ -10,12 +17,12 @@ public class Main {
         Persistencia persistencia = new Persistencia();
         CentralDeInformacoes central = persistencia.recuperarCentral("central.xml");
         Scanner s = new Scanner(System.in);
+        Scanner s1 = new Scanner(System.in);
 
         String op = "";
 
-        while(op.equalsIgnoreCase("s")){
+        while(!op.equals("S")){
 
-            System.out.println("\n=== MENU DO GERENCIADOR DE TEATRO ===");
             System.out.println("1 - Nova pessoa");
             System.out.println("2 - Listar todas as pessoas");
             System.out.println("3 - Exibir informações de uma pessoa específica");
@@ -26,7 +33,166 @@ public class Main {
             System.out.println("S - Sair");
             System.out.print("Escolha uma opção: ");
 
-            op = s.nextLine();
+            op = s1.nextLine().toUpperCase();
+
+            switch (op){
+                case "1":
+                    System.out.print("Digite o Nome: ");
+                    String nome = s.nextLine();
+
+                    System.out.print("Digite o CPF: ");
+                    String CPF = s.nextLine();
+
+                    System.out.print("Digite o E-mail: ");
+                    String email = s.nextLine();
+
+                    System.out.print("Digite o Sexo: (ex: MASCULINO, FEMININO, OUTRO)");
+                    String sexo = s.nextLine();
+                    PessoaSexo sexoConvertido = PessoaSexo.valueOf(sexo.toUpperCase());
+
+                    Pessoa novaPessoa = new Pessoa(nome, CPF, email, sexoConvertido);
+
+                    if(central.adicionarPessoa(novaPessoa)){
+                        persistencia.salvarCentral(central, "central.xml");
+                        System.out.println("pessoa cadastrada e salva com sucesso!");
+                    }else {
+                        System.out.println("erro pq já existe uma pessoa cadastrada com este CPF.");
+                    }
+                    break;
+
+                case "2":
+                    System.out.println("LISTA DE PESSOAS");
+
+                    if (central.getTodasAsPessoas().isEmpty()) {
+                        System.out.println("Nenhuma pessoa cadastrada no sistema.");
+                    } else {
+                        for (Pessoa pessoa : central.getTodasAsPessoas()) {
+                            System.out.println("Nome: " + pessoa.getNome() + " | CPF: " + pessoa.getCpf());
+                        }
+                    }
+                    break;
+
+                case "3":
+                    System.out.println("BUSCA DE PESSOA");
+                    System.out.print("Digite o CPF da pessoa: ");
+                    String cpfBusca = s.nextLine();
+
+                    Pessoa pessoaEncontrada = central.recuperarPessoaPorCPF(cpfBusca);
+
+                    if (pessoaEncontrada != null) {
+                        System.out.println("Informaçoes encontradas:");
+                        System.out.println(pessoaEncontrada.toString());
+                    } else {
+                        System.out.println("pessoa não existe no sistema.");
+                    }
+                    break;
+
+                case "4":
+                    System.out.println("NOVA PROPOSTA DE ALUGUEL");
+                    System.out.print("digite o CPF do Locatario (Artista): ");
+                    String cpfLocatario = s.nextLine();
+
+                    Pessoa locatario = central.recuperarPessoaPorCPF(cpfLocatario);
+
+                    if (locatario == null) {
+                        System.out.println("Erro: pessoa não cadastrada. cadastre primeiro.");
+                        break;
+                    }
+
+                    System.out.print("nome da Peça: ");
+                    String nomePeca = s.nextLine();
+
+                    System.out.print("data de Inicio (Formato AAAA-MM-DD): ");
+                    LocalDate dataInicio = LocalDate.parse(s.nextLine());
+
+                    System.out.print("data de Fim (Formato AAAA-MM-DD): ");
+                    LocalDate dataFim = LocalDate.parse(s.nextLine());
+
+                    System.out.print("valor Total do Aluguel (ex: 500.00): ");
+                    float valor = Float.parseFloat(s.nextLine());
+
+                    LocalDate dataCadastro = LocalDate.now();
+
+                    PropostaDeAluguel novaProposta = new PropostaDeAluguel(dataCadastro, dataInicio, dataFim, nomePeca, valor, locatario);
+
+                    if (central.adicionarProposta(novaProposta)) {
+                        persistencia.salvarCentral(central, "central.xml");
+                        System.out.println("Proposta cadastrada e salva!");
+                    } else {
+                        System.out.println("nao foi possível cadastrar a proposta.");
+                    }
+                    break;
+
+                case "5":
+                    System.out.println("ESTATÍSTICAS");
+
+                    int qtdPropostas = central.getTodasAsPropostas().size();
+                    System.out.println("qantidade total de propostas cadastradas: " + qtdPropostas);
+                    break;
+
+                case "6":
+                    System.out.println("DETALHES DA PROPOSTA");
+                    System.out.print("digite o ID da proposta: ");
+                    try {
+                        long idDetalhe = Long.parseLong(s.nextLine());
+                        PropostaDeAluguel propDetalhe = central.recuperarPropostaPorId(idDetalhe);
+
+                        if (propDetalhe != null) {
+                            System.out.println("resumo da Proposta:");
+                            System.out.println("ID: " + propDetalhe.getId());
+                            System.out.println("Peça: " + propDetalhe.getNomeDaPeca());
+                            System.out.println("Locatário: " + propDetalhe.getLocatario().getNome());
+                            System.out.println("Período: " + propDetalhe.getDataDeInicioDoAluguel() + " até " + propDetalhe.getDataDeFimDoAluguel());
+                            System.out.println("Status atual: " + propDetalhe.getStatus());
+                        } else {
+                            System.out.println("proposta não encontrada no sistema.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("erro: O ID deve ser um número válido.");
+                    }
+                    break;
+
+                case "7":
+                    System.out.println("ATIVAR PROPOSTA E GERAR CONTRATO");
+                    System.out.print("digite o ID da proposta para ativar: ");
+                    try {
+                        long idAtivar = Long.parseLong(s.nextLine());
+                        PropostaDeAluguel propAtivar = central.recuperarPropostaPorId(idAtivar);
+
+                        if (propAtivar != null) {
+
+                            propAtivar.setStatus(PropostaDeAluguelStatus.ATIVO);
+
+                            persistencia.salvarCentral(central, "central.xml");
+                            System.out.println("[OK] - Status alterado para ATIVO e salvo no XML.");
+
+                            System.out.println("Gerando contrato em PDF...");
+                            GeradorDeContratos.obterContrato(idAtivar, central);
+
+                            String emailDestino = propAtivar.getLocatario().getEmail();
+                            System.out.println("estabelecendo conexão com o servidor de e-mail");
+                            System.out.println("iniciando envio para " + emailDestino + " (Aguarde, isso pode levar alguns segundos)...");
+
+                            Mensageiro.enviarEmail(emailDestino, "contrato.pdf");
+
+                            System.out.println("[SUCESSO] Fluxo de ativação concluído.");
+
+                        } else {
+                            System.out.println("erro: Proposta não encontrada.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("erro: O ID deve ser um número numérico.");
+                    }
+                    break;
+
+                case "S":
+                    System.out.println("encerrando o Gerenciador de Teatro.");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida. Por favor, escolha um item válido do menu.");
+                    break;
+            }
         }
     }
 }

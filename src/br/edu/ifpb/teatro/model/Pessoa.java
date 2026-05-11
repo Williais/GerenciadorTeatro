@@ -8,9 +8,9 @@ public class Pessoa {
     private String cpf;
     private String email;
 
-    public Pessoa(String email, String cpf, PessoaSexo sexo, String nome) {
+    public Pessoa(String nome, String cpf, String email, PessoaSexo sexo) {
         this.email = email;
-        this.cpf = cpf;
+        this.cpf = cpf; // lembrar de criar uma validação para melhorar nosso projeto
         this.sexo = sexo;
         this.nome = nome;
     }
