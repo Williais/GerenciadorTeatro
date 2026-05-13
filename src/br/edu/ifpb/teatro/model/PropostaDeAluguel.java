@@ -90,7 +90,7 @@ public class PropostaDeAluguel {
     }
 
     public boolean isAtivo() {
-        if (status == PropostaDeAluguelStatus.ATIVO && LocalDate.now().isAfter(getDataDeInicioDoAluguel())) {
+        if (status == PropostaDeAluguelStatus.ATIVO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
             status = PropostaDeAluguelStatus.INATIVO;
             return false;
         }
@@ -99,6 +99,7 @@ public class PropostaDeAluguel {
             status = PropostaDeAluguelStatus.NAO_CONTRATADO;
             return false;
         }
+
         return status == PropostaDeAluguelStatus.ATIVO;
 
     }
