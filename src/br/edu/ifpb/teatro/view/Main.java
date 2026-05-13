@@ -17,7 +17,6 @@ public class Main {
         Persistencia persistencia = new Persistencia();
         CentralDeInformacoes central = persistencia.recuperarCentral("central.xml");
         Scanner s = new Scanner(System.in);
-        Scanner s1 = new Scanner(System.in);
 
         String op = "";
 
@@ -33,30 +32,34 @@ public class Main {
             System.out.println("S - Sair");
             System.out.print("Escolha uma opção: ");
 
-            op = s1.nextLine().toUpperCase();
+            op = s.nextLine().toUpperCase();
 
             switch (op){
                 case "1":
-                    System.out.print("Digite o Nome: ");
-                    String nome = s.nextLine();
+                    try {
+                        System.out.print("Digite o Nome: ");
+                        String nome = s.nextLine();
 
-                    System.out.print("Digite o CPF: ");
-                    String CPF = s.nextLine();
+                        System.out.print("Digite o CPF: ");
+                        String CPF = s.nextLine();
 
-                    System.out.print("Digite o E-mail: ");
-                    String email = s.nextLine();
+                        System.out.print("Digite o E-mail: ");
+                        String email = s.nextLine();
 
-                    System.out.print("Digite o Sexo: (ex: MASCULINO, FEMININO, OUTRO)");
-                    String sexo = s.nextLine();
-                    PessoaSexo sexoConvertido = PessoaSexo.valueOf(sexo.toUpperCase());
+                        System.out.print("Digite o Sexo: (ex: MASCULINO, FEMININO, OUTRO)");
+                        String sexo = s.nextLine();
+                        PessoaSexo sexoConvertido = PessoaSexo.valueOf(sexo.toUpperCase());
 
-                    Pessoa novaPessoa = new Pessoa(nome, CPF, email, sexoConvertido);
+                        Pessoa novaPessoa = new Pessoa(nome, CPF, email, sexoConvertido);
 
-                    if(central.adicionarPessoa(novaPessoa)){
-                        persistencia.salvarCentral(central, "central.xml");
-                        System.out.println("pessoa cadastrada e salva com sucesso!");
-                    }else {
-                        System.out.println("erro pq já existe uma pessoa cadastrada com este CPF.");
+                        if (central.adicionarPessoa(novaPessoa)) {
+                            persistencia.salvarCentral(central, "central.xml");
+                            System.out.println("pessoa cadastrada e salva com sucesso!");
+                        } else {
+                            System.out.println("erro pq já existe uma pessoa cadastrada com este CPF.");
+                        }
+                    } catch (IllegalArgumentException e){
+                        System.out.println("Erro: Opção de sexo invalida! use MASCULINO, FEMININO ou OUTRO.");
                     }
                     break;
 
