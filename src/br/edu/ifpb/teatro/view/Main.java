@@ -20,7 +20,7 @@ public class Main {
 
         String op = "";
 
-        while(!op.equals("S")){
+        while (!op.equals("S")) {
 
             System.out.println("1 - Nova pessoa");
             System.out.println("2 - Listar todas as pessoas");
@@ -34,7 +34,7 @@ public class Main {
 
             op = s.nextLine().toUpperCase();
 
-            switch (op){
+            switch (op) {
                 case "1":
                     try {
                         System.out.print("Digite o Nome: ");
@@ -58,7 +58,7 @@ public class Main {
                         } else {
                             System.out.println("erro pq já existe uma pessoa cadastrada com este CPF.");
                         }
-                    } catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println("Erro: Opção de sexo invalida! use MASCULINO, FEMININO ou OUTRO.");
                     }
                     break;
@@ -128,9 +128,28 @@ public class Main {
 
                 case "5":
                     System.out.println("ESTATÍSTICAS");
-
+                    int qntAtiva = 0;
+                    int qntInativa = 0;
+                    int qntEmAvaliacao = 0;
+                    int qntNaoContratado = 0;
                     int qtdPropostas = central.getTodasAsPropostas().size();
+
+                    for (PropostaDeAluguel p : central.getTodasAsPropostas()) {
+                        if (p.getStatus() == PropostaDeAluguelStatus.ATIVO) {
+                            qntAtiva++;
+                        } else if (p.getStatus() == PropostaDeAluguelStatus.EM_AVALIACAO) {
+                            qntEmAvaliacao++;
+                        } else if (p.getStatus() == PropostaDeAluguelStatus.INATIVO) {
+                            qntInativa++;
+                        } else if (p.getStatus() == PropostaDeAluguelStatus.NAO_CONTRATADO) {
+                            qntNaoContratado++;
+                        }
+                    }
                     System.out.println("qantidade total de propostas cadastradas: " + qtdPropostas);
+                    System.out.println("propostas ativas: " + qntAtiva);
+                    System.out.println("Propostas em avaliacao: " + qntEmAvaliacao);
+                    System.out.println("Propostas inativas: " + qntInativa);
+                    System.out.println("Propostas não contratadas: " + qntNaoContratado);
                     break;
 
                 case "6":
