@@ -23,7 +23,7 @@ public class PropostaDeAluguel {
         this.nomeDaPeca = nomeDaPeca;
         this.valorTotalDoAluguel = valorTotalDoAluguel;
         this.locatario = locatario;
-        this.status = StatusProposta.EM_AVALIACAO;
+        this.status = StatusProposta.EM_CONTRATACAO;
         this.id ++;
     }
 
@@ -88,17 +88,17 @@ public class PropostaDeAluguel {
     }
 
     public boolean isAtivo() {
-        if (status == StatusProposta.ATIVO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
-            status = StatusProposta.INATIVO;
+        if (status == StatusProposta.CONTRATADO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
+            status = StatusProposta.ENCERRADO;
             return false;
         }
 
-        if (status == StatusProposta.EM_AVALIACAO && LocalDate.now().isAfter(getDataDeCadastro().plusDays(2))) {
-            status = StatusProposta.NAO_CONTRATADO;
+        if (status == StatusProposta.EM_CONTRATACAO && LocalDate.now().isAfter(getDataDeCadastro().plusDays(2))) {
+            status = StatusProposta.ENCERRADO;
             return false;
         }
 
-        return status == StatusProposta.ATIVO;
+        return status == StatusProposta.CONTRATADO;
 
     }
 
