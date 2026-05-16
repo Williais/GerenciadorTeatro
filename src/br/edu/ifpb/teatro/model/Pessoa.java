@@ -2,17 +2,23 @@ package br.edu.ifpb.teatro.model;
 
 import br.edu.ifpb.teatro.enums.PessoaSexo;
 
-public class Pessoa {
+import java.time.LocalDate;
+
+public  class Pessoa {
     private String nome;
     private PessoaSexo sexo;
     private String cpf;
     private String email;
+    private String telefone;
+    private String dataNascimento;
 
-    public Pessoa(String nome, String cpf, String email, PessoaSexo sexo) {
+    public Pessoa(String nome, String cpf, String email, PessoaSexo sexo, String telefone, String data) {
         this.email = email;
-        this.cpf = cpf; // lembrar de criar uma validação para melhorar nosso projeto
+        this.cpf = cpf;
         this.sexo = sexo;
         this.nome = nome;
+        this.telefone = telefone;
+        this.dataNascimento = data;
     }
 
     public String getNome() {
@@ -45,5 +51,21 @@ public class Pessoa {
 
     public String toString() {
         return nome;
+    }
+
+    public String getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(String dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 }

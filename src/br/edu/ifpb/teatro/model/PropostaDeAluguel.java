@@ -1,10 +1,8 @@
 package br.edu.ifpb.teatro.model;
 
-import br.edu.ifpb.teatro.enums.PropostaDeAluguelStatus;
+import br.edu.ifpb.teatro.enums.StatusProposta;
 
 import java.time.LocalDate;
-
-import static java.lang.System.currentTimeMillis;
 
 public class PropostaDeAluguel {
 
@@ -16,7 +14,7 @@ public class PropostaDeAluguel {
     private String nomeDaPeca;
     private float valorTotalDoAluguel;
     private Pessoa locatario;
-    private PropostaDeAluguelStatus status;
+    private StatusProposta status;
 
     public PropostaDeAluguel(LocalDate dataDeCadastro, LocalDate dataDeInicioDoAluguel, LocalDate dataDeFimDoAluguel, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario) {
         this.dataDeCadastro = dataDeCadastro;
@@ -25,7 +23,7 @@ public class PropostaDeAluguel {
         this.nomeDaPeca = nomeDaPeca;
         this.valorTotalDoAluguel = valorTotalDoAluguel;
         this.locatario = locatario;
-        this.status = PropostaDeAluguelStatus.EM_AVALIACAO;
+        this.status = StatusProposta.EM_AVALIACAO;
         this.id ++;
     }
 
@@ -77,11 +75,11 @@ public class PropostaDeAluguel {
         this.locatario = locatario;
     }
 
-    public PropostaDeAluguelStatus getStatus() {
+    public StatusProposta getStatus() {
         return status;
     }
 
-    public void setStatus(PropostaDeAluguelStatus status) {
+    public void setStatus(StatusProposta status) {
         this.status = status;
     }
 
@@ -90,17 +88,17 @@ public class PropostaDeAluguel {
     }
 
     public boolean isAtivo() {
-        if (status == PropostaDeAluguelStatus.ATIVO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
-            status = PropostaDeAluguelStatus.INATIVO;
+        if (status == StatusProposta.ATIVO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
+            status = StatusProposta.INATIVO;
             return false;
         }
 
-        if (status == PropostaDeAluguelStatus.EM_AVALIACAO && LocalDate.now().isAfter(getDataDeCadastro().plusDays(2))) {
-            status = PropostaDeAluguelStatus.NAO_CONTRATADO;
+        if (status == StatusProposta.EM_AVALIACAO && LocalDate.now().isAfter(getDataDeCadastro().plusDays(2))) {
+            status = StatusProposta.NAO_CONTRATADO;
             return false;
         }
 
-        return status == PropostaDeAluguelStatus.ATIVO;
+        return status == StatusProposta.ATIVO;
 
     }
 

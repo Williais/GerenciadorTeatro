@@ -3,9 +3,10 @@ package br.edu.ifpb.teatro.view;
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
 import br.edu.ifpb.teatro.enums.PessoaSexo;
-import br.edu.ifpb.teatro.enums.PropostaDeAluguelStatus;
+import br.edu.ifpb.teatro.enums.StatusProposta;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
+import br.edu.ifpb.teatro.security.ValidadorDocumento;
 import br.edu.ifpb.teatro.util.GeradorDeContratos;
 import br.edu.ifpb.teatro.util.Mensageiro;
 
@@ -42,6 +43,8 @@ public class Main {
 
                         System.out.print("Digite o CPF: ");
                         String CPF = s.nextLine();
+                        ValidadorDocumento.validarCPF(CPF); //to validando...
+
 
                         System.out.print("Digite o E-mail: ");
                         String email = s.nextLine();
@@ -50,7 +53,14 @@ public class Main {
                         String sexo = s.nextLine();
                         PessoaSexo sexoConvertido = PessoaSexo.valueOf(sexo.toUpperCase());
 
-                        Pessoa novaPessoa = new Pessoa(nome, CPF, email, sexoConvertido);
+                        System.out.print("Digite o Telefone: ");
+                        String telefone = s.nextLine();
+
+                        System.out.print("Digite sua data de Nascimento: (dd-mm-aaaa)");
+                        String data = s.nextLine();
+
+
+                        Pessoa novaPessoa = new Pessoa(nome, CPF, email, sexoConvertido, telefone, data);
 
                         if (central.adicionarPessoa(novaPessoa)) {
                             persistencia.salvarCentral(central, "central.xml");
@@ -128,28 +138,28 @@ public class Main {
 
                 case "5":
                     System.out.println("ESTATÍSTICAS");
-                    int qntAtiva = 0;
-                    int qntInativa = 0;
-                    int qntEmAvaliacao = 0;
-                    int qntNaoContratado = 0;
+                    int qntContratado = 0;
+                    int qntContAlterado = 0;
+                    int qntEmContratacao = 0;
+                    int qntEncerrado = 0;
                     int qtdPropostas = central.getTodasAsPropostas().size();
 
                     for (PropostaDeAluguel p : central.getTodasAsPropostas()) {
-                        if (p.getStatus() == PropostaDeAluguelStatus.ATIVO) {
-                            qntAtiva++;
-                        } else if (p.getStatus() == PropostaDeAluguelStatus.EM_AVALIACAO) {
-                            qntEmAvaliacao++;
-                        } else if (p.getStatus() == PropostaDeAluguelStatus.INATIVO) {
-                            qntInativa++;
-                        } else if (p.getStatus() == PropostaDeAluguelStatus.NAO_CONTRATADO) {
-                            qntNaoContratado++;
+                        if (p.getStatus() == StatusProposta.CONTRATADO) {
+                            qntContratado++;
+                        } else if (p.getStatus() == StatusProposta.EM_CONTRATACAO) {
+                            qntEmContratacao++;
+                        } else if (p.getStatus() == StatusProposta.CONTRATADO_COM_ALTERACAO) {
+                            qntContAlterado++;
+                        } else if (p.getStatus() == StatusProposta.ENCERRADO) {
+                            qntEncerrado++;
                         }
                     }
                     System.out.println("qantidade total de propostas cadastradas: " + qtdPropostas);
-                    System.out.println("propostas ativas: " + qntAtiva);
-                    System.out.println("Propostas em avaliacao: " + qntEmAvaliacao);
-                    System.out.println("Propostas inativas: " + qntInativa);
-                    System.out.println("Propostas não contratadas: " + qntNaoContratado);
+                    System.out.println("propostas Contratados: " + qntContratado);
+                    System.out.println("Propostas em Contratação: " + qntEmContratacao);
+                    System.out.println("Propostas De Contratos Alterados: " + qntContAlterado);
+                    System.out.println("Propostas Encerradas: " + qntEncerrado);
                     break;
 
                 case "6":
@@ -183,7 +193,7 @@ public class Main {
 
                         if (propAtivar != null) {
 
-                            propAtivar.setStatus(PropostaDeAluguelStatus.ATIVO);
+                            propAtivar.setStatus(StatusProposta.CONTRATADO);
 
                             persistencia.salvarCentral(central, "central.xml");
                             System.out.println("[OK] - Status alterado para ATIVO e salvo no XML.");
