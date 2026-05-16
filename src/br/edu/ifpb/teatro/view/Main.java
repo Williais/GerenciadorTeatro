@@ -10,6 +10,7 @@ import br.edu.ifpb.teatro.security.ValidadorDocumento;
 import br.edu.ifpb.teatro.util.GeradorDeContratos;
 import br.edu.ifpb.teatro.util.Mensageiro;
 
+
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -17,8 +18,19 @@ public class Main {
     public static void main(String[] args) {
         Persistencia persistencia = new Persistencia();
         CentralDeInformacoes central = persistencia.recuperarCentral("central.xml");
-        Scanner s = new Scanner(System.in);
+        //Scanner s = new Scanner(System.in);
 
+        // aq eu preciso verificar se existe algum adm cadastrado
+        if(central.getAdministrador() == null){
+            // se caso nao tiver nenhum adm, vai pra tela de cadastro
+            TelaCadastroAdm telaCadastro = new TelaCadastroAdm(central);
+            telaCadastro.setVisible(true); // esse comando exibe a tela
+        }else{
+           // TelaLoginAdm telaLogin = new TelaLoginAdm();
+           // telaLogin.setVisible(true);
+
+        }
+/*
         String op = "";
 
         while (!op.equals("S")) {
@@ -225,6 +237,6 @@ public class Main {
                     System.out.println("Opção inválida. Por favor, escolha um item válido do menu.");
                     break;
             }
-        }
+        }*/
     }
 }

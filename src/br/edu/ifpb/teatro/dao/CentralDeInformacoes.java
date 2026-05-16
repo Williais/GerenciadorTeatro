@@ -1,5 +1,6 @@
 package br.edu.ifpb.teatro.dao;
 
+import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 
@@ -10,7 +11,15 @@ public class CentralDeInformacoes {
 
     private List<Pessoa> todasAsPessoas = new ArrayList<>();
     private List<PropostaDeAluguel> todasAsPropostas = new ArrayList<>();
+    private ADM administrador;
 
+    public ADM getAdministrador() {
+        return administrador;
+    }
+
+    public void setAdministrador(ADM administrador) {
+        this.administrador = administrador;
+    }
 
     public List<PropostaDeAluguel> getTodasAsPropostas() {
         return todasAsPropostas;
