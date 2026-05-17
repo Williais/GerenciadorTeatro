@@ -9,6 +9,8 @@ import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.security.ValidadorDocumento;
 import br.edu.ifpb.teatro.util.GeradorDeContratos;
 import br.edu.ifpb.teatro.util.Mensageiro;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 
 
 import java.time.LocalDate;
@@ -16,9 +18,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+        try {
+            FlatDarculaLaf.setup();
+        } catch (Exception ex) {
+            System.err.println("FlatLaf falhou. O sistema vai usar o tema padrão (Feio demais).");
+        }
+
         Persistencia persistencia = new Persistencia();
         CentralDeInformacoes central = persistencia.recuperarCentral("central.xml");
-        //Scanner s = new Scanner(System.in);
 
         // aq eu preciso verificar se existe algum adm cadastrado
         if(central.getAdministrador() == null){
@@ -26,8 +34,8 @@ public class Main {
             TelaCadastroAdm telaCadastro = new TelaCadastroAdm(central);
             telaCadastro.setVisible(true); // esse comando exibe a tela
         }else{
-           // TelaLoginAdm telaLogin = new TelaLoginAdm();
-           // telaLogin.setVisible(true);
+           TelaLoginAdm telaLogin = new TelaLoginAdm(central);
+           telaLogin.setVisible(true);
 
         }
 /*

@@ -7,7 +7,7 @@ public class ValidadorSenha {
             throw new RuntimeException("A senha precisa ter, no minimo, 8 digitos.");
         }
 
-        if (senha.matches("(\\d)\\1{8}")) {
+        if (senha.matches("(\\d)\\1{6}")) {
             throw new RuntimeException("a senha não pode ser composta por dígitos repetidos.");
         }
     }
