@@ -111,7 +111,9 @@ public class TelaLoginAdm extends JFrame {
         cartaoLogin.add(btnEsqueciSenha, gbc);
 
         btnEsqueciSenha.addActionListener(e -> {
-
+            this.dispose();
+            TelaEsqueciSenha esqueciSenha = new TelaEsqueciSenha(central);
+            esqueciSenha.setVisible(true);
         });
 
 
