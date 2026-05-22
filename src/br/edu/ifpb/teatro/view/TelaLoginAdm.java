@@ -155,7 +155,8 @@ public class TelaLoginAdm extends JFrame {
             }
 
         }catch (RuntimeException error){
-            JOptionPane.showMessageDialog(this, "Email e/ou senha incorretos!", "Erro ao tentar acessar o sistema", JOptionPane.ERROR_MESSAGE);
+            //JOptionPane.showMessageDialog(this, error.getMessage(), "Erro ao tentar acessar o sistema", JOptionPane.ERROR_MESSAGE);
+           JOptionPane.showMessageDialog(this, "Email e/ou senha incorretos!", "Erro ao tentar acessar o sistema", JOptionPane.ERROR_MESSAGE);
 
         }
 

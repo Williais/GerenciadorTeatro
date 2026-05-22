@@ -34,8 +34,12 @@ public class Main {
             TelaCadastroAdm telaCadastro = new TelaCadastroAdm(central);
             telaCadastro.setVisible(true); // esse comando exibe a tela
         }else{
-           TelaLoginAdm telaLogin = new TelaLoginAdm(central);
-           telaLogin.setVisible(true);
+
+            TelaHome home = new TelaHome(central);
+            home.setVisible(true);
+
+           //TelaLoginAdm telaLogin = new TelaLoginAdm(central);
+           //telaLogin.setVisible(true);
 
         }
 /*
