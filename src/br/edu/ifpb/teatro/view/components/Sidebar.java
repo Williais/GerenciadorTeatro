@@ -6,14 +6,18 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static br.edu.ifpb.teatro.view.TelaHome.*;
 import static br.edu.ifpb.teatro.view.TelaHome.TEXT_MAIN;
 import static br.edu.ifpb.teatro.view.TelaHome.ACCENT_COLOR;
 import static br.edu.ifpb.teatro.view.TelaHome.PANEL_COLOR;
 
 public class Sidebar extends JPanel {
+    private List<JButton> botoesMenu = new ArrayList<>();
 
-    public Sidebar(CentralDeInformacoes central){
+    public Sidebar(CentralDeInformacoes central, JPanel painelCentral, CardLayout layout){
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setPreferredSize(new Dimension(210, 0));
@@ -40,11 +44,23 @@ public class Sidebar extends JPanel {
         this.add(logoPanel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        this.add(createMenuButton("📊 Dashboard", true));
-        this.add(createMenuButton("💲 Regras de Preço", false));
-        this.add(createMenuButton("📅 Aluguéis e Peças", false));
-        this.add(createMenuButton("🎟️ Venda de Ingressos", false));
-        this.add(createMenuButton("📈 Relatórios", false));
+        JButton btnDashboard = createMenuButton("📊 Dashboard", true);
+        JButton btnRegras = createMenuButton("💲 Regras de Preço", false);
+        JButton btnAlugueis = createMenuButton("📅 Aluguéis e Peças", false);
+        JButton btnVendas = createMenuButton("🎟️ Venda de Ingressos", false);
+        JButton btnRelatorios = createMenuButton("📈 Relatórios", false);
+
+        this.add(btnDashboard);
+        this.add(btnRegras);
+        this.add(btnAlugueis);
+        this.add(btnVendas);
+        this.add(btnRelatorios);
+
+        botoesMenu.add(btnDashboard);
+        botoesMenu.add(btnRegras);
+        botoesMenu.add(btnAlugueis);
+        botoesMenu.add(btnVendas);
+        botoesMenu.add(btnRelatorios);
 
         this.add(Box.createVerticalGlue()); // faz com o que o botão sair fique para baixo
 
@@ -52,6 +68,32 @@ public class Sidebar extends JPanel {
         btnSair.setForeground(new Color(255, 100, 100));
         this.add(btnSair);
         this.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        //é aq que o SPA é aplicado usando o .show
+        btnDashboard.addActionListener(e -> {
+            layout.show(painelCentral, "DASHBOARD");
+            ativarBotao(btnDashboard);
+        });
+
+        btnRegras.addActionListener(e -> {
+            layout.show(painelCentral, "REGRAS");
+            ativarBotao(btnRegras);
+        });
+
+        btnAlugueis.addActionListener(e -> {
+            layout.show(painelCentral, "ALUGUEL");
+            ativarBotao(btnAlugueis);
+        });
+
+        btnVendas.addActionListener(e -> {
+            layout.show(painelCentral, "VENDA");
+            ativarBotao(btnVendas);
+        });
+
+        btnRelatorios.addActionListener(e -> {
+            layout.show(painelCentral, "RELATORIO");
+            ativarBotao(btnRelatorios);
+        });
     }
 
     public JButton createMenuButton(String nome, boolean ativo){
@@ -75,5 +117,16 @@ public class Sidebar extends JPanel {
 
         btn.setAlignmentX(Component.LEFT_ALIGNMENT);
         return btn;
+    }
+
+    private void ativarBotao(JButton botaoClicado) {
+        for (JButton btn : botoesMenu) {
+            // se o botao atual for igual ao botao clicado, ele fica ativo
+            boolean ativo = (btn == botaoClicado);
+
+            btn.setFont(new Font("SansSerif", ativo ? Font.BOLD : Font.PLAIN, 12));
+            btn.setForeground(ativo ? Color.WHITE : TEXT_MAIN);
+            btn.setBackground(ativo ? ACCENT_COLOR : PANEL_COLOR);
+        }
     }
 }
