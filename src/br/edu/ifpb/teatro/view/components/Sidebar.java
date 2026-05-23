@@ -1,6 +1,7 @@
 package br.edu.ifpb.teatro.view.components;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
+import br.edu.ifpb.teatro.view.TelaLoginAdm;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -68,6 +69,19 @@ public class Sidebar extends JPanel {
         btnSair.setForeground(new Color(255, 100, 100));
         this.add(btnSair);
         this.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        btnSair.addActionListener(e -> {
+            int resposta = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair do sistema?", "Exclusão", JOptionPane.YES_NO_OPTION);
+
+            if(resposta == JOptionPane.YES_OPTION){
+                Window janela = SwingUtilities.getWindowAncestor(this); //aq é pq preciso saber quem é a tela que ta atualmente, considerando que um JPanel NÃO TEM .dispose()
+
+                janela.dispose();
+
+                TelaLoginAdm telaLogin = new TelaLoginAdm(central);
+                telaLogin.setVisible(true);
+            }
+        });
 
         //é aq que o SPA é aplicado usando o .show
         btnDashboard.addActionListener(e -> {
