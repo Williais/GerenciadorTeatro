@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class TelaCadastroAdm extends JFrame {
 
-    private CentralDeInformacoes central;
+    private CentralDeInformacoes central; //ver depois
 
     public TelaCadastroAdm(CentralDeInformacoes central) {
         this.central = central;
