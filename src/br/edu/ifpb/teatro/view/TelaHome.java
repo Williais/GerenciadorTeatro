@@ -37,7 +37,7 @@ public class TelaHome extends JFrame {
         painelCentral.add(new RegrasPrecoPanel(), "REGRAS");
         painelCentral.add(new Aluguel(central), "ALUGUEL");
         painelCentral.add(new Relatorio(), "RELATORIO");
-        painelCentral.add(new VendaIngresso(), "VENDA");
+        painelCentral.add(new VendaIngresso(central), "VENDA");
 
         Sidebar menuLateral = new Sidebar(central, painelCentral, layout);
         this.add(menuLateral, BorderLayout.WEST);

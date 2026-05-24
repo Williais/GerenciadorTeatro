@@ -1,6 +1,7 @@
 package br.edu.ifpb.teatro.dao;
 
 import br.edu.ifpb.teatro.model.ADM;
+import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 
@@ -14,6 +15,7 @@ public class CentralDeInformacoes {
     private List<Pessoa> todasAsPessoas = new ArrayList<>();
     private List<PropostaDeAluguel> todasAsPropostas = new ArrayList<>();
     private ADM administrador;
+    private List<Ingresso> todosOsIngressos = new ArrayList<>();
 
     public ADM getAdministrador() {
         return administrador;
@@ -29,6 +31,10 @@ public class CentralDeInformacoes {
 
     public void setTodasAsPropostas(List<PropostaDeAluguel> todasAsPropostas) {
         this.todasAsPropostas = todasAsPropostas;
+    }
+
+    public List<Ingresso> getIngresso() {
+        return todosOsIngressos;
     }
 
     public List<Pessoa> getTodasAsPessoas() {
@@ -116,4 +122,42 @@ public class CentralDeInformacoes {
         }
         return encontrado;
     }
-}
+
+    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd){
+        try {
+            if (evento == null || comprador == null || qtd <= 0) {
+                throw new RuntimeException("Não foi possivel acessar os dados solicitados");
+            }
+
+            if (recuperarPessoaPorCPF(comprador.getCpf()) == null){
+                adicionarPessoa(comprador);
+            }
+
+            Ingresso ingresso = new Ingresso(comprador, evento, qtd);
+
+            todosOsIngressos.add(ingresso);
+
+            return true;
+
+        } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public List<Ingresso> gerarListaDeIngressos(long id){
+        List<Ingresso> ingressos = new ArrayList<>();
+        try{
+
+        for (Ingresso ingresso : todosOsIngressos){
+            if (ingresso.getId() == id){
+                ingressos.add(ingresso);}
+        }
+
+        return ingressos;
+
+    } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            throw new RuntimeException(e);
+        }
+    }
+    }
