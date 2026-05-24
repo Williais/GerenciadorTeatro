@@ -153,7 +153,22 @@ public class VendaIngresso extends JPanel {
         // GERAR O INGRESSO
     }
 
+    private JTextField adicionarCampoFormulario(JPanel container, String nomeLabel) {
+        JLabel label = new JLabel(nomeLabel);
+        label.setForeground(Color.LIGHT_GRAY);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JTextField textField = new JTextField();
+        textField.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+        textField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        container.add(label);
+        container.add(Box.createRigidArea(new Dimension(0, 5)));
+        container.add(textField);
+        container.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        return textField;
+    }
 
 
 }

@@ -69,4 +69,5 @@ public class Aluguel extends JPanel {
 
         return painel;
     }
+
 }
