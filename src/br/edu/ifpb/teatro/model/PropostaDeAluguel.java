@@ -3,28 +3,63 @@ package br.edu.ifpb.teatro.model;
 import br.edu.ifpb.teatro.enums.StatusProposta;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class PropostaDeAluguel {
 
-    // nao sei como acessar quando o main me pede o id, ent vou colocar com incrementação e depois eu coloco o currentTimeMillis
-    private long id = 0; //currentTimeMillis();
+    private long id = System.currentTimeMillis();
+    private LocalDate dataDoEvento;
+    private LocalTime horaInicioLocacao;
+    private LocalTime horaFimLocacao;
+    private float precoDoIngresso;
     private LocalDate dataDeCadastro;
-    private LocalDate dataDeInicioDoAluguel;
-    private LocalDate dataDeFimDoAluguel;
     private String nomeDaPeca;
     private float valorTotalDoAluguel;
     private Pessoa locatario;
     private StatusProposta status;
 
-    public PropostaDeAluguel(LocalDate dataDeCadastro, LocalDate dataDeInicioDoAluguel, LocalDate dataDeFimDoAluguel, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario) {
+    public PropostaDeAluguel(LocalDate dataDeCadastro, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario, LocalDate dataDoEvento, LocalTime horaInicioLocacao, LocalTime horaFimLocacao, float precoDoIngresso) {
         this.dataDeCadastro = dataDeCadastro;
-        this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
-        this.dataDeFimDoAluguel = dataDeFimDoAluguel;
         this.nomeDaPeca = nomeDaPeca;
         this.valorTotalDoAluguel = valorTotalDoAluguel;
         this.locatario = locatario;
         this.status = StatusProposta.EM_CONTRATACAO;
-        this.id ++;
+        this.dataDoEvento = dataDoEvento;
+        this.horaFimLocacao = horaFimLocacao;
+        this.horaInicioLocacao = horaInicioLocacao;
+        this.precoDoIngresso = precoDoIngresso;
+    }
+
+    public float getPrecoDoIngresso() {
+        return precoDoIngresso;
+    }
+
+    public void setPrecoDoIngresso(float precoDoIngresso) {
+        this.precoDoIngresso = precoDoIngresso;
+    }
+
+    public LocalTime getHoraFimLocacao() {
+        return horaFimLocacao;
+    }
+
+    public void setHoraFimLocacao(LocalTime horaFimLocacao) {
+        this.horaFimLocacao = horaFimLocacao;
+    }
+
+    public LocalTime getHoraInicioLocacao() {
+        return horaInicioLocacao;
+    }
+
+    public void setHoraInicioLocacao(LocalTime horaInicioLocacao) {
+        this.horaInicioLocacao = horaInicioLocacao;
+    }
+
+    public LocalDate getDataDoEvento() {
+        return dataDoEvento;
+    }
+
+    public void setDataDoEvento(LocalDate dataDoEvento) {
+        this.dataDoEvento = dataDoEvento;
     }
 
     public LocalDate getDataDeCadastro() {
@@ -33,22 +68,6 @@ public class PropostaDeAluguel {
 
     public void setDataDeCadastro(LocalDate dataDeCadastro) {
         this.dataDeCadastro = dataDeCadastro;
-    }
-
-    public LocalDate getDataDeInicioDoAluguel() {
-        return dataDeInicioDoAluguel;
-    }
-
-    public void setDataDeInicioDoAluguel(LocalDate dataDeInicioDoAluguel) {
-        this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
-    }
-
-    public LocalDate getDataDeFimDoAluguel() {
-        return dataDeFimDoAluguel;
-    }
-
-    public void setDataDeFimDoAluguel(LocalDate dataDeFimDoAluguel) {
-        this.dataDeFimDoAluguel = dataDeFimDoAluguel;
     }
 
     public String getNomeDaPeca() {
@@ -88,7 +107,7 @@ public class PropostaDeAluguel {
     }
 
     public boolean isAtivo() {
-        if (status == StatusProposta.CONTRATADO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
+        if (status == StatusProposta.CONTRATADO && LocalDate.now().isAfter(getDataDoEvento())) {
             status = StatusProposta.ENCERRADO;
             return false;
         }

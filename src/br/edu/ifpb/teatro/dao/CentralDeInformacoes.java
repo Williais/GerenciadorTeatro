@@ -4,6 +4,8 @@ import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,31 @@ public class CentralDeInformacoes {
 
     public void setTodasAsPessoas(List<Pessoa> todasAsPessoas) {
         this.todasAsPessoas = todasAsPessoas;
+    }
+
+    public void validarHorarioLocacao(LocalDate data, LocalTime inicioPeca, LocalTime fimPeca) throws Exception {
+        //a regra de 1h antes e 1h depois
+        LocalTime inicioReal = inicioPeca.minusHours(1);
+        LocalTime fimReal = fimPeca.plusHours(1);
+
+        // limite dos turnos (8-12, 13-18, 19-23)
+        boolean isManha = !inicioReal.isBefore(LocalTime.of(8, 0)) && !fimReal.isAfter(LocalTime.of(12, 0));
+        boolean isTarde = !inicioReal.isBefore(LocalTime.of(13, 0)) && !fimReal.isAfter(LocalTime.of(18, 0));
+        boolean isNoite = !inicioReal.isBefore(LocalTime.of(19, 0)) && !fimReal.isAfter(LocalTime.of(23, 0));
+
+        if (!isManha && !isTarde && !isNoite) {
+            throw new IllegalArgumentException("O horário (" + inicioReal + " às " + fimReal + ") ultrapassa os limites de um único turno permitido.");
+        }
+
+        // sobreposiçao de horario com outras peças no mesmo dia
+        for (PropostaDeAluguel proposta : todasAsPropostas) {
+            if (proposta.getDataDoEvento().equals(data)) {
+
+                if (inicioReal.isBefore(proposta.getHoraFimLocacao()) && fimReal.isAfter(proposta.getHoraInicioLocacao())) {
+                    throw new Exception("horario indisponovel! conflita com a peça: " + proposta.getNomeDaPeca());
+                }
+            }
+        }
     }
 
     public boolean adicionarPessoa(Pessoa p){
