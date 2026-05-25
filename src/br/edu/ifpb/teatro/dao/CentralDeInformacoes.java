@@ -3,6 +3,9 @@ package br.edu.ifpb.teatro.dao;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
+import br.edu.ifpb.teatro.model.RegraDePreco;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,7 @@ public class CentralDeInformacoes {
 
     private List<Pessoa> todasAsPessoas = new ArrayList<>();
     private List<PropostaDeAluguel> todasAsPropostas = new ArrayList<>();
+    private List<RegraDePreco> todasAsRegras = new ArrayList<>();
     private ADM administrador;
 
     public ADM getAdministrador() {
@@ -65,6 +69,16 @@ public class CentralDeInformacoes {
         return true;
     }
 
+    public void adicionarRegra(RegraDePreco novaRegra) {
+        todasAsRegras.add(novaRegra);
+    }
+
+    public List<RegraDePreco> getTodasAsRegras() {
+        return todasAsRegras;
+    }
+
+
+
     public PropostaDeAluguel recuperarPropostaPorId(long id){
         for (PropostaDeAluguel proposta : todasAsPropostas){
             if(proposta.getId() == id){
@@ -74,6 +88,8 @@ public class CentralDeInformacoes {
 
         return null;
     }
+
+
 
     public List<PropostaDeAluguel> recuperarPropostasDeUmaPessoa(String cpf){
         if(recuperarPessoaPorCPF(cpf) == null){
