@@ -1,35 +1,53 @@
 package br.edu.ifpb.teatro.model;
 
-import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.io.Serializable;
 
-public class RegraDePreco {
+
+//Esta classe representa uma regra de tarifação
+//se um campo for nulo a regra vale para todos
+//Ex: Se diaDaSemana for NULL vale para a semana toda.
+
+public class RegraDePreco implements Serializable {
+
     private long id;
     private float valorHora;
-    private LocalDate periodoAplicacao;
 
-    public RegraDePreco(long id, float valorHora, LocalDate periodoAplicacao) {
-        this.id = id;
+    private DayOfWeek diaDaSemana;
+    private String turno;
+    private LocalTime horaInicio;
+    private LocalTime horaFim;
+    private Integer mes;
+
+    public void setMes(Integer mes) {
+        this.mes = mes;
+    }
+
+    public Integer getMes() {
+        return mes;
+    }
+
+    public RegraDePreco(float valorHora) {
+        this.id = System.currentTimeMillis();
         this.valorHora = valorHora;
-        this.periodoAplicacao = periodoAplicacao;
     }
 
-    public long getId() {
-        return id;
-    }
 
-    public float getValorHora() {
-        return valorHora;
-    }
+    public long getId() { return id; }
 
-    public void setValorHora(float valorHora) {
-        this.valorHora = valorHora;
-    }
+    public float getValorHora() { return valorHora; }
+    public void setValorHora(float valorHora) { this.valorHora = valorHora; }
 
-    public LocalDate getPeriodoAplicacao() {
-        return periodoAplicacao;
-    }
+    public DayOfWeek getDiaDaSemana() { return diaDaSemana; }
+    public void setDiaDaSemana(DayOfWeek diaDaSemana) { this.diaDaSemana = diaDaSemana; }
 
-    public void setPeriodoAplicacao(LocalDate periodoAplicacao) {
-        this.periodoAplicacao = periodoAplicacao;
-    }
+    public String getTurno() { return turno; }
+    public void setTurno(String turno) { this.turno = turno; }
+
+    public LocalTime getHoraInicio() { return horaInicio; }
+    public void setHoraInicio(LocalTime horaInicio) { this.horaInicio = horaInicio; }
+
+    public LocalTime getHoraFim() { return horaFim; }
+    public void setHoraFim(LocalTime horaFim) { this.horaFim = horaFim; }
 }
