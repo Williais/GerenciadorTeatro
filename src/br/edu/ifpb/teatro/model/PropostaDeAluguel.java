@@ -1,22 +1,23 @@
 package br.edu.ifpb.teatro.model;
 
 import br.edu.ifpb.teatro.enums.StatusProposta;
+import java.io.Serializable;
+import java.time.LocalDateTime; // alterando para datatime para pegar a hora tambem ja que é um dos requisitos nas regras de preco
 
-import java.time.LocalDate;
-
-public class PropostaDeAluguel {
+public class PropostaDeAluguel implements Serializable { // O implements Serializable permite que o Java transforme este objeto em dados (bytes/XML)
+                                                        // para que ele possa ser salvo em arquivos e recuperado depois sem perder as informações.
 
     // nao sei como acessar quando o main me pede o id, ent vou colocar com incrementação e depois eu coloco o currentTimeMillis
     private long id = 0; //currentTimeMillis();
-    private LocalDate dataDeCadastro;
-    private LocalDate dataDeInicioDoAluguel;
-    private LocalDate dataDeFimDoAluguel;
+    private LocalDateTime dataDeCadastro;
+    private LocalDateTime dataDeInicioDoAluguel;
+    private LocalDateTime dataDeFimDoAluguel;
     private String nomeDaPeca;
     private float valorTotalDoAluguel;
     private Pessoa locatario;
     private StatusProposta status;
 
-    public PropostaDeAluguel(LocalDate dataDeCadastro, LocalDate dataDeInicioDoAluguel, LocalDate dataDeFimDoAluguel, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario) {
+    public PropostaDeAluguel(LocalDateTime dataDeCadastro, LocalDateTime dataDeInicioDoAluguel, LocalDateTime dataDeFimDoAluguel, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario) {
         this.dataDeCadastro = dataDeCadastro;
         this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
         this.dataDeFimDoAluguel = dataDeFimDoAluguel;
@@ -27,27 +28,27 @@ public class PropostaDeAluguel {
         this.id ++;
     }
 
-    public LocalDate getDataDeCadastro() {
+    public LocalDateTime getDataDeCadastro() {
         return dataDeCadastro;
     }
 
-    public void setDataDeCadastro(LocalDate dataDeCadastro) {
+    public void setDataDeCadastro(LocalDateTime dataDeCadastro) {
         this.dataDeCadastro = dataDeCadastro;
     }
 
-    public LocalDate getDataDeInicioDoAluguel() {
+    public LocalDateTime getDataDeInicioDoAluguel() {
         return dataDeInicioDoAluguel;
     }
 
-    public void setDataDeInicioDoAluguel(LocalDate dataDeInicioDoAluguel) {
+    public void setDataDeInicioDoAluguel(LocalDateTime dataDeInicioDoAluguel) {
         this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
     }
 
-    public LocalDate getDataDeFimDoAluguel() {
+    public LocalDateTime getDataDeFimDoAluguel() {
         return dataDeFimDoAluguel;
     }
 
-    public void setDataDeFimDoAluguel(LocalDate dataDeFimDoAluguel) {
+    public void setDataDeFimDoAluguel(LocalDateTime dataDeFimDoAluguel) {
         this.dataDeFimDoAluguel = dataDeFimDoAluguel;
     }
 
@@ -88,12 +89,12 @@ public class PropostaDeAluguel {
     }
 
     public boolean isAtivo() {
-        if (status == StatusProposta.CONTRATADO && LocalDate.now().isAfter(getDataDeFimDoAluguel())) {
+        if (status == StatusProposta.CONTRATADO && LocalDateTime.now().isAfter(getDataDeFimDoAluguel())) {
             status = StatusProposta.ENCERRADO;
             return false;
         }
 
-        if (status == StatusProposta.EM_CONTRATACAO && LocalDate.now().isAfter(getDataDeCadastro().plusDays(2))) {
+        if (status == StatusProposta.EM_CONTRATACAO && LocalDateTime.now().isAfter(getDataDeCadastro().plusDays(2))) {
             status = StatusProposta.ENCERRADO;
             return false;
         }
