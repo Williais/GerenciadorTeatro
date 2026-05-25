@@ -147,9 +147,10 @@ public class TelaLoginAdm extends JFrame {
             ValidadorSenha.validandoSenha(senha);
             if (email.equals(adminSalvo.getEmail()) && senha.equals(adminSalvo.getSenha())) {
                 this.dispose();
-                JOptionPane.showMessageDialog(null, "Login realizado com sucesso! (Abrindo Home...)");
+
                 TelaHome telaHome = new TelaHome(central);
                 telaHome.setVisible(true);
+
             } else {
                 JOptionPane.showMessageDialog(this, "Email e/ou senha incorretos!", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
             }

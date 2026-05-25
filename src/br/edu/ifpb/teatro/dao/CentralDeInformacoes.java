@@ -1,12 +1,15 @@
 package br.edu.ifpb.teatro.dao;
 
 import br.edu.ifpb.teatro.model.ADM;
+import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.model.RegraDePreco;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +19,7 @@ public class CentralDeInformacoes {
     private List<PropostaDeAluguel> todasAsPropostas = new ArrayList<>();
     private List<RegraDePreco> todasAsRegras = new ArrayList<>();
     private ADM administrador;
+    private List<Ingresso> todosOsIngressos = new ArrayList<>();
 
     public ADM getAdministrador() {
         return administrador;
@@ -33,12 +37,41 @@ public class CentralDeInformacoes {
         this.todasAsPropostas = todasAsPropostas;
     }
 
+    public List<Ingresso> getIngresso() {
+        return todosOsIngressos;
+    }
+
     public List<Pessoa> getTodasAsPessoas() {
         return todasAsPessoas;
     }
 
     public void setTodasAsPessoas(List<Pessoa> todasAsPessoas) {
         this.todasAsPessoas = todasAsPessoas;
+    }
+
+    public void validarHorarioLocacao(LocalDate data, LocalTime inicioPeca, LocalTime fimPeca) throws Exception {
+        //a regra de 1h antes e 1h depois
+        LocalTime inicioReal = inicioPeca.minusHours(1);
+        LocalTime fimReal = fimPeca.plusHours(1);
+
+        // limite dos turnos (8-12, 13-18, 19-23)
+        boolean isManha = !inicioReal.isBefore(LocalTime.of(8, 0)) && !fimReal.isAfter(LocalTime.of(12, 0));
+        boolean isTarde = !inicioReal.isBefore(LocalTime.of(13, 0)) && !fimReal.isAfter(LocalTime.of(18, 0));
+        boolean isNoite = !inicioReal.isBefore(LocalTime.of(19, 0)) && !fimReal.isAfter(LocalTime.of(23, 0));
+
+        if (!isManha && !isTarde && !isNoite) {
+            throw new IllegalArgumentException("O horário (" + inicioReal + " às " + fimReal + ") ultrapassa os limites de um único turno permitido.");
+        }
+
+        // sobreposiçao de horario com outras peças no mesmo dia
+        for (PropostaDeAluguel proposta : todasAsPropostas) {
+            if (proposta.getDataDoEvento().equals(data)) {
+
+                if (inicioReal.isBefore(proposta.getHoraFimLocacao()) && fimReal.isAfter(proposta.getHoraInicioLocacao())) {
+                    throw new Exception("horario indisponovel! conflita com a peça: " + proposta.getNomeDaPeca());
+                }
+            }
+        }
     }
 
     public boolean adicionarPessoa(Pessoa p){
@@ -105,4 +138,42 @@ public class CentralDeInformacoes {
         }
         return encontrado;
     }
-}
+
+    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd){
+        try {
+            if (evento == null || comprador == null || qtd <= 0) {
+                throw new RuntimeException("Não foi possivel acessar os dados solicitados");
+            }
+
+            if (recuperarPessoaPorCPF(comprador.getCpf()) == null){
+                adicionarPessoa(comprador);
+            }
+
+            Ingresso ingresso = new Ingresso(comprador, evento, qtd);
+
+            todosOsIngressos.add(ingresso);
+
+            return true;
+
+        } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public List<Ingresso> gerarListaDeIngressos(long id){
+        List<Ingresso> ingressos = new ArrayList<>();
+        try{
+
+        for (Ingresso ingresso : todosOsIngressos){
+            if (ingresso.getId() == id){
+                ingressos.add(ingresso);}
+        }
+
+        return ingressos;
+
+    } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            throw new RuntimeException(e);
+        }
+    }
+    }

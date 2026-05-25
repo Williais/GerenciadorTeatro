@@ -2,118 +2,83 @@ package br.edu.ifpb.teatro.model;
 
 import br.edu.ifpb.teatro.enums.StatusProposta;
 import java.io.Serializable;
-import java.time.LocalDateTime; // alterando para datatime para pegar a hora tambem ja que é um dos requisitos nas regras de preco
+import java.time.LocalDateTime;
 
-public class PropostaDeAluguel implements Serializable { // O implements Serializable permite que o Java transforme este objeto em dados (bytes/XML)
-                                                        // para que ele possa ser salvo em arquivos e recuperado depois sem perder as informações.
+public class PropostaDeAluguel implements Serializable {
 
-    // nao sei como acessar quando o main me pede o id, ent vou colocar com incrementação e depois eu coloco o currentTimeMillis
-    private long id = 0; //currentTimeMillis();
+    private long id;
     private LocalDateTime dataDeCadastro;
-    private LocalDateTime dataDeInicioDoAluguel;
-    private LocalDateTime dataDeFimDoAluguel;
+    private LocalDateTime inicioEvento; // Conciliado: substitui dataDeInicioDoAluguel e dataDoEvento
+    private LocalDateTime fimEvento;    // Conciliado: substitui dataDeFimDoAluguel e horaFimLocacao
     private String nomeDaPeca;
     private float valorTotalDoAluguel;
+    private float precoDoIngresso;      // Adicionado da versão de will
     private Pessoa locatario;
     private StatusProposta status;
 
-    public PropostaDeAluguel(LocalDateTime dataDeCadastro, LocalDateTime dataDeInicioDoAluguel, LocalDateTime dataDeFimDoAluguel, String nomeDaPeca, float valorTotalDoAluguel, Pessoa locatario) {
+    public PropostaDeAluguel(LocalDateTime dataDeCadastro, LocalDateTime inicioEvento, LocalDateTime fimEvento,
+                             String nomeDaPeca, float valorTotalDoAluguel, float precoDoIngresso, Pessoa locatario) {
+        this.id = System.currentTimeMillis();
         this.dataDeCadastro = dataDeCadastro;
-        this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
-        this.dataDeFimDoAluguel = dataDeFimDoAluguel;
+        this.inicioEvento = inicioEvento;
+        this.fimEvento = fimEvento;
         this.nomeDaPeca = nomeDaPeca;
         this.valorTotalDoAluguel = valorTotalDoAluguel;
+        this.precoDoIngresso = precoDoIngresso;
         this.locatario = locatario;
         this.status = StatusProposta.EM_CONTRATACAO;
-        this.id ++;
     }
 
-    public LocalDateTime getDataDeCadastro() {
-        return dataDeCadastro;
-    }
+    public long getId() { return id; }
 
-    public void setDataDeCadastro(LocalDateTime dataDeCadastro) {
-        this.dataDeCadastro = dataDeCadastro;
-    }
+    public LocalDateTime getDataDeCadastro() { return dataDeCadastro; }
+    public void setDataDeCadastro(LocalDateTime dataDeCadastro) { this.dataDeCadastro = dataDeCadastro; }
 
-    public LocalDateTime getDataDeInicioDoAluguel() {
-        return dataDeInicioDoAluguel;
-    }
+    public LocalDateTime getInicioEvento() { return inicioEvento; }
+    public void setInicioEvento(LocalDateTime inicioEvento) { this.inicioEvento = inicioEvento; }
 
-    public void setDataDeInicioDoAluguel(LocalDateTime dataDeInicioDoAluguel) {
-        this.dataDeInicioDoAluguel = dataDeInicioDoAluguel;
-    }
+    public LocalDateTime getFimEvento() { return fimEvento; }
+    public void setFimEvento(LocalDateTime fimEvento) { this.fimEvento = fimEvento; }
 
-    public LocalDateTime getDataDeFimDoAluguel() {
-        return dataDeFimDoAluguel;
-    }
+    public String getNomeDaPeca() { return nomeDaPeca; }
+    public void setNomeDaPeca(String nomeDaPeca) { this.nomeDaPeca = nomeDaPeca; }
 
-    public void setDataDeFimDoAluguel(LocalDateTime dataDeFimDoAluguel) {
-        this.dataDeFimDoAluguel = dataDeFimDoAluguel;
-    }
+    public float getValorTotalDoAluguel() { return valorTotalDoAluguel; }
+    public void setValorTotalDoAluguel(float valorTotalDoAluguel) { this.valorTotalDoAluguel = valorTotalDoAluguel; }
 
-    public String getNomeDaPeca() {
-        return nomeDaPeca;
-    }
+    public float getPrecoDoIngresso() { return precoDoIngresso; }
+    public void setPrecoDoIngresso(float precoDoIngresso) { this.precoDoIngresso = precoDoIngresso; }
 
-    public void setNomeDaPeca(String nomeDaPeca) {
-        this.nomeDaPeca = nomeDaPeca;
-    }
+    public Pessoa getLocatario() { return locatario; }
+    public void setLocatario(Pessoa locatario) { this.locatario = locatario; }
 
-    public float getValorTotalDoAluguel() {
-        return valorTotalDoAluguel;
-    }
+    public StatusProposta getStatus() { return status; }
+    public void setStatus(StatusProposta status) { this.status = status; }
 
-    public void setValorTotalDoAluguel(float valorTotalDoAluguel) {
-        this.valorTotalDoAluguel = valorTotalDoAluguel;
-    }
-
-    public Pessoa getLocatario() {
-        return locatario;
-    }
-
-    public void setLocatario(Pessoa locatario) {
-        this.locatario = locatario;
-    }
-
-    public StatusProposta getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusProposta status) {
-        this.status = status;
-    }
-
-    public long getId() {
-        return id;
-    }
-
+    // Lógica de Atividade (Usando a nova variável inicioEvento)
     public boolean isAtivo() {
-        if (status == StatusProposta.CONTRATADO && LocalDateTime.now().isAfter(getDataDeFimDoAluguel())) {
+        LocalDateTime agora = LocalDateTime.now();
+
+        if (status == StatusProposta.CONTRATADO && agora.isAfter(fimEvento)) {
             status = StatusProposta.ENCERRADO;
             return false;
         }
 
-        if (status == StatusProposta.EM_CONTRATACAO && LocalDateTime.now().isAfter(getDataDeCadastro().plusDays(2))) {
+        if (status == StatusProposta.EM_CONTRATACAO && agora.isAfter(dataDeCadastro.plusDays(2))) {
             status = StatusProposta.ENCERRADO;
             return false;
         }
 
         return status == StatusProposta.CONTRATADO;
-
     }
 
-    public String toString(){
-        String ativo = "";
-
-        if(isAtivo()){
-            ativo = "Sim";
-        }else {
-            ativo = "Não";
-        }
-        return "Nome da Peça: " + nomeDaPeca + "\n"
-                + "Nome do Locatário: " + locatario.getNome() + " (CPF: " + locatario.getCpf() + ") " + "\n"
-                + "Está Ativo?: " + ativo + "\n"
+    @Override
+    public String toString() {
+        String ativo = isAtivo() ? "Sim" : "Não";
+        return "Peça: " + nomeDaPeca + "\n"
+                + "Locatário: " + locatario.getNome() + "\n"
+                + "Início: " + inicioEvento + "\n"
+                + "Ativo: " + ativo + "\n"
                 + "Status: " + status;
     }
 }

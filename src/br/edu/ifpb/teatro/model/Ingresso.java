@@ -9,18 +9,15 @@ public class Ingresso {
     private int quantidade;
     private LocalDate dataEmissao;
 
-    public Ingresso(long id, Pessoa comprador, PropostaDeAluguel evento, int quantidade, LocalDate dataEmissao) {
-        this.id = id;
+    public Ingresso(Pessoa comprador, PropostaDeAluguel evento, int quantidade) {
         this.comprador = comprador;
         this.evento = evento;
         this.quantidade = quantidade;
-        this.dataEmissao = dataEmissao;
     }
 
     public long getId() {
         return id;
     }
-
 
     public Pessoa getComprador() {
         return comprador;
@@ -50,7 +47,4 @@ public class Ingresso {
         return dataEmissao;
     }
 
-    public void setDataEmissao(LocalDate dataEmissao) {
-        this.dataEmissao = dataEmissao;
-    }
 }
