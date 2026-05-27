@@ -5,8 +5,6 @@ import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.model.RegraDePreco;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -50,23 +48,20 @@ public class CentralDeInformacoes {
     }
 
     public void validarHorarioLocacao(LocalDate data, LocalTime inicioPeca, LocalTime fimPeca) throws Exception {
-        //a regra de 1h antes e 1h depois
+
         LocalTime inicioReal = inicioPeca.minusHours(1);
         LocalTime fimReal = fimPeca.plusHours(1);
 
-        // limite dos turnos (8-12, 13-18, 19-23)
         boolean isManha = !inicioReal.isBefore(LocalTime.of(8, 0)) && !fimReal.isAfter(LocalTime.of(12, 0));
         boolean isTarde = !inicioReal.isBefore(LocalTime.of(13, 0)) && !fimReal.isAfter(LocalTime.of(18, 0));
         boolean isNoite = !inicioReal.isBefore(LocalTime.of(19, 0)) && !fimReal.isAfter(LocalTime.of(23, 0));
 
         if (!isManha && !isTarde && !isNoite) {
-            throw new IllegalArgumentException("O horário (" + inicioReal + " às " + fimReal + ") ultrapassa os limites de um único turno permitido.");
+            throw new IllegalArgumentException("O horário (" + inicioReal + " as " + fimReal + ") ultrapassa os limites de um único turno permitido.");
         }
 
-        // sobreposiçao de horario com outras peças no mesmo dia
         for (PropostaDeAluguel proposta : todasAsPropostas) {
-            if (proposta.getDataDoEvento().equals(data)) {
-
+            if (proposta.getDataEvento().equals(data)) {
                 if (inicioReal.isBefore(proposta.getHoraFimLocacao()) && fimReal.isAfter(proposta.getHoraInicioLocacao())) {
                     throw new Exception("horario indisponovel! conflita com a peça: " + proposta.getNomeDaPeca());
                 }
@@ -78,13 +73,11 @@ public class CentralDeInformacoes {
         if(recuperarPessoaPorCPF(p.getCpf()) != null){
             return false;
         }
-
         todasAsPessoas.add(p);
         return true;
     }
 
     public Pessoa recuperarPessoaPorCPF(String cpf){
-
         for (Pessoa p : todasAsPessoas){
             if(p.getCpf().equals(cpf)){
                 return p;
@@ -97,7 +90,6 @@ public class CentralDeInformacoes {
         if(recuperarPropostaPorId(p.getId()) != null){
             return false;
         }
-
         todasAsPropostas.add(p);
         return true;
     }
@@ -110,19 +102,14 @@ public class CentralDeInformacoes {
         return todasAsRegras;
     }
 
-
-
     public PropostaDeAluguel recuperarPropostaPorId(long id){
         for (PropostaDeAluguel proposta : todasAsPropostas){
             if(proposta.getId() == id){
                 return proposta;
             }
         }
-
         return null;
     }
-
-
 
     public List<PropostaDeAluguel> recuperarPropostasDeUmaPessoa(String cpf){
         if(recuperarPessoaPorCPF(cpf) == null){
@@ -130,7 +117,6 @@ public class CentralDeInformacoes {
         }
 
         List<PropostaDeAluguel> encontrado = new ArrayList<>();
-
         for(PropostaDeAluguel p : todasAsPropostas){
             if (p.getLocatario().getCpf().equals(cpf)){
                 encontrado.add(p);
@@ -150,30 +136,25 @@ public class CentralDeInformacoes {
             }
 
             Ingresso ingresso = new Ingresso(comprador, evento, qtd);
-
             todosOsIngressos.add(ingresso);
 
             return true;
-
-        } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public List<Ingresso> gerarListaDeIngressos(long id){
         List<Ingresso> ingressos = new ArrayList<>();
         try{
-
-        for (Ingresso ingresso : todosOsIngressos){
-            if (ingresso.getId() == id){
-                ingressos.add(ingresso);}
-        }
-
-        return ingressos;
-
-    } catch (Exception e) { //Alterar erro !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            for (Ingresso ingresso : todosOsIngressos){
+                if (ingresso.getId() == id){
+                    ingressos.add(ingresso);
+                }
+            }
+            return ingressos;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    }
+}

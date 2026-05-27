@@ -2,19 +2,8 @@ package br.edu.ifpb.teatro.view;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
-import br.edu.ifpb.teatro.enums.PessoaSexo;
-import br.edu.ifpb.teatro.enums.StatusProposta;
-import br.edu.ifpb.teatro.model.Pessoa;
-import br.edu.ifpb.teatro.model.PropostaDeAluguel;
-import br.edu.ifpb.teatro.security.ValidadorDocumento;
-import br.edu.ifpb.teatro.util.GeradorDeContratos;
-import br.edu.ifpb.teatro.util.Mensageiro;
+
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-
-
-import java.time.LocalDate;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -42,24 +31,7 @@ public class Main {
 
         }
 /*
-        String op = "";
 
-        while (!op.equals("S")) {
-
-            System.out.println("1 - Nova pessoa");
-            System.out.println("2 - Listar todas as pessoas");
-            System.out.println("3 - Exibir informações de uma pessoa específica");
-            System.out.println("4 - Nova proposta");
-            System.out.println("5 - Informar quantidade de propostas cadastradas");
-            System.out.println("6 - Detalhar uma proposta");
-            System.out.println("7 - Ativar uma proposta");
-            System.out.println("S - Sair");
-            System.out.print("Escolha uma opção: ");
-
-            op = s.nextLine().toUpperCase();
-
-            switch (op) {
-                case "1":
                     try {
                         System.out.print("Digite o Nome: ");
                         String nome = s.nextLine();

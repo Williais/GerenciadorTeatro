@@ -4,7 +4,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.io.Serializable;
 
-
 //Esta classe representa uma regra de tarifação
 //se um campo for nulo a regra vale para todos
 //Ex: Se diaDaSemana for NULL vale para a semana toda.
@@ -20,19 +19,10 @@ public class RegraDePreco implements Serializable {
     private LocalTime horaFim;
     private Integer mes;
 
-    public void setMes(Integer mes) {
-        this.mes = mes;
-    }
-
-    public Integer getMes() {
-        return mes;
-    }
-
     public RegraDePreco(float valorHora) {
         this.id = System.currentTimeMillis();
         this.valorHora = valorHora;
     }
-
 
     public long getId() { return id; }
 
@@ -50,4 +40,7 @@ public class RegraDePreco implements Serializable {
 
     public LocalTime getHoraFim() { return horaFim; }
     public void setHoraFim(LocalTime horaFim) { this.horaFim = horaFim; }
+
+    public Integer getMes() { return mes; }
+    public void setMes(Integer mes) { this.mes = mes; }
 }

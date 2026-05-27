@@ -39,7 +39,7 @@ public class Aluguel extends JPanel {
         btnNovo.putClientProperty("Component.arc", 15);
 
         painel.add(lblTitulo);
-        painel.add(Box.createHorizontalGlue()); //título pra esquerda e o botão pra direita
+        painel.add(Box.createHorizontalGlue());
         painel.add(btnNovo);
 
         btnNovo.addActionListener(e -> {
@@ -56,7 +56,6 @@ public class Aluguel extends JPanel {
         JPanel painel = new JPanel(new BorderLayout());
         painel.setBackground(PANEL_COLOR);
 
-        // Dados estáticos temporqrio
         String[] colunas = {"Data", "Turno", "Evento", "Artista", "Status"};
         Object[][] dados = {
                 {"20/06/2026", "Noite", "O Auto da Compadecida", "Cia Suassuna", "Contratado"},
