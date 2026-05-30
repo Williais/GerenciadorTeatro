@@ -4,7 +4,7 @@ import br.edu.ifpb.teatro.enums.PessoaSexo;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public  class Pessoa implements Serializable {
+public  class Pessoa {
     private String nome;
     private PessoaSexo sexo;
     private String cpf;

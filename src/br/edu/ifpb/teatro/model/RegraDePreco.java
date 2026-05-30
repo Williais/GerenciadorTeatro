@@ -2,13 +2,13 @@ package br.edu.ifpb.teatro.model;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.io.Serializable;
+
 
 //Esta classe representa uma regra de tarifação
 //se um campo for nulo a regra vale para todos
 //Ex: Se diaDaSemana for NULL vale para a semana toda.
 
-public class RegraDePreco implements Serializable {
+public class RegraDePreco{
 
     private long id;
     private float valorHora;

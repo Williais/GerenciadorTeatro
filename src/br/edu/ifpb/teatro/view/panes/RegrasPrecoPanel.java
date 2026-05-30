@@ -5,6 +5,8 @@ import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import static br.edu.ifpb.teatro.view.TelaHome.*;
 
@@ -139,6 +141,8 @@ public class RegrasPrecoPanel extends JPanel {
         painel.add(painelAcoes, BorderLayout.SOUTH);
 
         return painel;
+
+
     }
 
     private JTextField adicionarCampoTexto(JPanel container, String nomeLabel) {
