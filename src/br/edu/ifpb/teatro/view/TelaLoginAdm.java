@@ -1,6 +1,7 @@
 package br.edu.ifpb.teatro.view;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
+import br.edu.ifpb.teatro.exception.SenhaInvalidaException;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.security.ValidadorSenha;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -155,7 +156,7 @@ public class TelaLoginAdm extends JFrame {
                 JOptionPane.showMessageDialog(this, "Email e/ou senha incorretos!", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
             }
 
-        }catch (RuntimeException error){
+        }catch (RuntimeException | SenhaInvalidaException error){
             //JOptionPane.showMessageDialog(this, error.getMessage(), "Erro ao tentar acessar o sistema", JOptionPane.ERROR_MESSAGE);
            JOptionPane.showMessageDialog(this, "Email e/ou senha incorretos!", "Erro ao tentar acessar o sistema", JOptionPane.ERROR_MESSAGE);
 

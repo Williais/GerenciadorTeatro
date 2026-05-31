@@ -12,6 +12,6 @@ public class ValidadorTurno {
         } else if (!inicio.isBefore(LocalTime.of(19, 0)) && !inicio.isAfter(LocalTime.of(23, 59))){
             return "Noite";
         } else{
-            return "Turno Invalido";}
+            return "Turno Invalido";} //Cabe trocar o return por um TurnoInvalidoException?
     }
 }

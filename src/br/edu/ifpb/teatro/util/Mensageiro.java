@@ -49,8 +49,8 @@ public class Mensageiro {
             Transport.send(message); // enviando
             System.out.println("e-mail enviado com sucesso com o anexo: " + nomeArquivo);
 
-        } catch (Exception e) {
-            System.out.println("erro ao tentar enviar o e-mail: " + e.getMessage());
+        } catch (Exception erroDeEnvio) { //Mantive o Exception, já supre a necessidade do erro
+            System.out.println("erro ao tentar enviar o e-mail: " + erroDeEnvio.getMessage());
         }
     }
 

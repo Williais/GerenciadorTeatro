@@ -3,6 +3,7 @@ package br.edu.ifpb.teatro.view;
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
 import br.edu.ifpb.teatro.exception.CadastroNaoAutorizadoException;
+import br.edu.ifpb.teatro.exception.SenhaInvalidaException;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.security.ValidadorSenha;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -15,7 +16,7 @@ public class TelaCadastroAdm extends JFrame {
 
     private CentralDeInformacoes central; //ver depois
 
-    public TelaCadastroAdm(CentralDeInformacoes central) {
+    public TelaCadastroAdm(CentralDeInformacoes central) throws SenhaInvalidaException {
         this.central = central;
 
         setTitle("Cadastro do Administrador");
@@ -128,7 +129,7 @@ public class TelaCadastroAdm extends JFrame {
                 TelaLoginAdm telaLogin = new TelaLoginAdm(central);
                 telaLogin.setVisible(true);
 
-            } catch (RuntimeException error) {
+            } catch (RuntimeException | SenhaInvalidaException error) {
                 JOptionPane.showMessageDialog(this, error.getMessage(), "Erro na Senha", JOptionPane.ERROR_MESSAGE);
             }
         });

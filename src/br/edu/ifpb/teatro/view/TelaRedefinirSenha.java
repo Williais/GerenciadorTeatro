@@ -2,6 +2,7 @@ package br.edu.ifpb.teatro.view;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
+import br.edu.ifpb.teatro.exception.SenhaInvalidaException;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.security.ValidadorSenha;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -110,7 +111,7 @@ public class TelaRedefinirSenha extends JFrame {
 
                 TelaLoginAdm login = new TelaLoginAdm(central);
                 login.setVisible(true);
-            } catch (RuntimeException ex) {
+            } catch (RuntimeException | SenhaInvalidaException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro Fatal", JOptionPane.ERROR_MESSAGE);
             }
 

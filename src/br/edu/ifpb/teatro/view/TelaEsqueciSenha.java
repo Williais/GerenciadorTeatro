@@ -105,7 +105,7 @@ public class TelaEsqueciSenha extends JFrame {
                     });
 
                 } catch (RuntimeException ex) {
-                    //  avisamdo erro e reativando o botão
+                    //  avisando erro e reativando o botão
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
                         btnSubmit.setText("Enviar Código");

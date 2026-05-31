@@ -3,10 +3,11 @@ package br.edu.ifpb.teatro.view;
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
 
+import br.edu.ifpb.teatro.exception.SenhaInvalidaException;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SenhaInvalidaException {
 
         try {
             FlatDarculaLaf.setup();

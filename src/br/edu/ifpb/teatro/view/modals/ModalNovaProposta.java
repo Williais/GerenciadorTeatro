@@ -3,10 +3,7 @@ package br.edu.ifpb.teatro.view.modals;
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
 import br.edu.ifpb.teatro.enums.PessoaSexo;
-import br.edu.ifpb.teatro.exception.HorarioForaDoTurnoPermitidoException;
-import br.edu.ifpb.teatro.exception.HorarioIndisponivelException;
-import br.edu.ifpb.teatro.exception.PessoaJaCadastradaException;
-import br.edu.ifpb.teatro.exception.PropostaJaCadastradaException;
+import br.edu.ifpb.teatro.exception.*;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.security.ValidadorDocumento;
@@ -18,10 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -31,7 +25,7 @@ public class ModalNovaProposta extends JDialog {
     private JTextField txtNomeArtista;
     private JTextField txtTelefone;
     private JTextField txtEmail;
-    private JTextField txtGenero;
+    private JTextField txtGenero; //WILLIAM, TEM QUE ALTERAR PARA OPÇÕES
     private JTextField txtDataNascimento;
     private JTextField txtNomePeca;
     private JTextField txtDataEvento;
@@ -78,7 +72,7 @@ public class ModalNovaProposta extends JDialog {
         painelFormulario.add(txtEmail);
 
         painelFormulario.add(new JLabel("Gênero:"));
-        painelFormulario.add(txtGenero);
+        painelFormulario.add(txtGenero); //ALTERAR PARA OPÇÕES
 
         painelFormulario.add(new JLabel("Data de Nascimento (DD/MM/AAAA):"));
         painelFormulario.add(txtDataNascimento);
@@ -122,20 +116,30 @@ public class ModalNovaProposta extends JDialog {
 
         btnSalvar.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) throws NumberFormatException, DateTimeException {
                 try{
-                    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // pedro lance um erro aq de DateTimeParseException -> pode usar esse ja existente pq ele ja verifica se a data for em outro formato...
+                    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Achei meio-redundante criar uma Exception já que o DateTimeParseException vai fazer tudo.
 
                     LocalDate data = LocalDate.parse(txtDataEvento.getText(), formatador);
                     LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
                     LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
 
-                    float valorIngresso = Float.parseFloat(txtPrecoIngresso.getText()); // aq poderia ser um erro de NumberFormatException ou algo do tipo (caso o caba digite "dez reais" do que "10")
+                    float valorIngresso;
 
-                    central.validarHorarioLocacao(data, horaI, horaF); // pedro, aq vai ter o erro que ta la na central caso tenha choque de horarios e tals. verifica quais erros tem pra colocar aq.
+                        try {
+
+                            valorIngresso = Float.parseFloat(txtPrecoIngresso.getText());
+
+                        } catch (NumberFormatException erro) {
+                            throw new ValorIngressoInvalidoException("Digite um valor numérico válido para o preço do ingresso.");
+                        }
+
+                        central.validarHorarioLocacao(data, horaI, horaF); // Will, mantive o tratamento como foi feito lá na central, já que o metodo já possui Exceptions para o que foi pedido
 
 
                     String cpf = txtCpf.getText();
+
+                    ValidadorDocumento.validarCPF(cpf);
 
                     if(central.recuperarPessoaPorCPF(cpf) == null){
                         String cpfD = txtCpf.getText();
@@ -175,9 +179,57 @@ public class ModalNovaProposta extends JDialog {
 
                     JOptionPane.showMessageDialog(null, "Proposta de Aluguel Realizado");
 
-                }catch (HorarioForaDoTurnoPermitidoException | PropostaJaCadastradaException |
-                        PessoaJaCadastradaException | HorarioIndisponivelException | DateTimeParseException | NumberFormatException err){
-                    err.getMessage();
+                }catch (DateTimeParseException erro) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Por favor, verifique se o formato DD/MM/AAAA ou HH:MM está correto.",
+                            "Formatação inválida",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                } catch (CPFInvalidoException erro) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            erro.getMessage(),
+                            "CPF inválido",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                } catch (ValorIngressoInvalidoException erro) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            erro.getMessage(),
+                            "Valor do ingresso inválido",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                } catch (
+                        HorarioForaDoTurnoPermitidoException |
+                        HorarioIndisponivelException erro
+                ) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            erro.getMessage(),
+                            "Horário inválido",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                } catch (
+                        PessoaJaCadastradaException |
+                        PropostaJaCadastradaException erro
+                ) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            erro.getMessage(),
+                            "Erro de cadastro",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
                 }
             }
         });

@@ -41,7 +41,7 @@ public class ValidadorDocumento{
         int digito2Validacao = cpf.charAt(10) - '0';
 
         if(primeiroDigito != digito1Validacao || segundoDigito != digito2Validacao){
-            throw new RuntimeException("CPF Inválido");
+            throw new CPFInvalidoException("CPF Inválido");
         }
 
 
