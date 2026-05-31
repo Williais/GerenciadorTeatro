@@ -5,6 +5,8 @@ import br.edu.ifpb.teatro.dao.Persistencia;
 import br.edu.ifpb.teatro.enums.StatusProposta;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.security.ValidadorTurno;
+import br.edu.ifpb.teatro.util.GeradorDeContratos;
+import br.edu.ifpb.teatro.util.Mensageiro;
 import br.edu.ifpb.teatro.view.modals.ModalNovaProposta;
 
 import javax.swing.*;
@@ -189,6 +191,23 @@ public class Aluguel extends JPanel {
 
                 JOptionPane.showMessageDialog(this, "Status atualizado com sucesso!");
                 atualizarTabela();
+            }
+        });
+
+        btnVerContrato.addActionListener(e -> {
+            if (propostaSelecionada != null){
+                GeradorDeContratos.obterContrato(propostaSelecionada.getId(), central);
+            }
+
+            int resposta = JOptionPane.showConfirmDialog(null, "Você deseja enviar para o email do artista?", "Confirmação", JOptionPane.YES_NO_OPTION);
+
+            if (resposta == JOptionPane.YES_OPTION){
+                try{
+
+                Mensageiro.enviarContrato(propostaSelecionada.getLocatario().getEmail(), "contrato.pdf");
+                } catch (Exception ex) { // precisa alterar essa exceção aq pedro
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
