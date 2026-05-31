@@ -1,12 +1,14 @@
 package br.edu.ifpb.teatro.security;
 
-public class ValidadorDocumento {
+import br.edu.ifpb.teatro.exception.CPFInvalidoException;
 
-    public static void validarCPF(String cpf){
+public class ValidadorDocumento{
+
+    public static void validarCPF(String cpf) throws CPFInvalidoException {
         cpf = cpf.replaceAll("\\D", "");
 
         if (cpf.length() != 11) {
-            throw new RuntimeException("O CPF precisa ter 11 dígitos.");
+            throw new CPFInvalidoException("O CPF precisa ter 11 dígitos.");
         }
 
         if (cpf.matches("(\\d)\\1{10}")) {
