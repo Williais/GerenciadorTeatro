@@ -8,11 +8,11 @@ public class ValidadorDocumento{
         cpf = cpf.replaceAll("\\D", "");
 
         if (cpf.length() != 11) {
-            throw new CPFInvalidoException("O CPF precisa ter 11 dígitos.");
+            throw new CPFInvalidoException("O CPF precisa ter 11 dígitos."); // adicionar erro
         }
 
         if (cpf.matches("(\\d)\\1{10}")) {
-            throw new RuntimeException("CPF Inválido: Não são permitidos dígitos repetidos.");
+            throw new CPFInvalidoException("CPF Inválido: Não são permitidos dígitos repetidos.");
         }
 
         int soma = 0;

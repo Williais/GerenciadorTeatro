@@ -9,7 +9,11 @@ public class CalculadoraPreco {
 
     public static float recuperarPrecoVigente(List<RegraDePreco> regras, LocalDateTime dataHoraDesejada) {
 
-        float precoVencedor = 10.0f;
+        float precoBase = 10.0f;
+
+        if (regras == null || regras.isEmpty()) {
+            return precoBase;
+        }
 
         LocalTime horaAluguel = dataHoraDesejada.toLocalTime();
         int mesAluguel = dataHoraDesejada.getMonthValue();
@@ -48,12 +52,12 @@ public class CalculadoraPreco {
             }
 
             if (atendeMes && atendeDia && atendeTurno && atendeHora) {
-                if (regra.getValorHora() > precoVencedor) {
-                    precoVencedor = regra.getValorHora();
+                if (regra.getValorHora() > precoBase) {
+                    precoBase = regra.getValorHora();
                 }
             }
         }
 
-        return precoVencedor;
+        return precoBase;
     }
 }

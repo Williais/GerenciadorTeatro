@@ -29,11 +29,11 @@ public class RegrasPrecoPanel extends JPanel {
         this.setBackground(BG_COLOR);
         this.setBorder(new EmptyBorder(25, 25, 25, 25));
 
-        this.add(criarPainelFormulario(), BorderLayout.WEST);
-        this.add(criarPainelTabela(), BorderLayout.CENTER);
+        this.add(PainelFormulario(), BorderLayout.WEST);
+        this.add(PainelTabela(), BorderLayout.CENTER);
     }
 
-    private JPanel criarPainelFormulario() {
+    private JPanel PainelFormulario() {
         JPanel painel = new JPanel(new BorderLayout());
         painel.setPreferredSize(new Dimension(350, 0));
         painel.setBackground(PANEL_COLOR);
@@ -107,10 +107,21 @@ public class RegrasPrecoPanel extends JPanel {
 
         painel.add(painelBotoes, BorderLayout.SOUTH);
 
+        btnLimpar.addActionListener(e -> {
+            txtNomeRegra.setText("");
+            txtValorBase.setText("");
+            txtHoraInicio.setText("");
+            txtHoraFim.setText("");
+            cbDiaSemana.setSelectedIndex(0);
+            cbTurno.setSelectedIndex(0);
+            cbMes.setSelectedIndex(0);
+        });
+
         return painel;
+
     }
 
-    private JPanel criarPainelTabela() {
+    private JPanel PainelTabela() {
         JPanel painel = new JPanel(new BorderLayout(0, 15));
         painel.setOpaque(false);
         painel.setBorder(new EmptyBorder(0, 10, 0, 0));
@@ -141,6 +152,7 @@ public class RegrasPrecoPanel extends JPanel {
         painel.add(painelAcoes, BorderLayout.SOUTH);
 
         return painel;
+
 
 
     }
