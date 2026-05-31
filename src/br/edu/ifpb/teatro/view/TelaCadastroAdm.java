@@ -2,6 +2,7 @@ package br.edu.ifpb.teatro.view;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.dao.Persistencia;
+import br.edu.ifpb.teatro.exception.CadastroNaoAutorizadoException;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.security.ValidadorSenha;
 import com.formdev.flatlaf.FlatClientProperties;

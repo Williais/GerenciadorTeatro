@@ -214,4 +214,8 @@ public class VendaIngresso extends JPanel {
 
         return textField;
     }
+
+    private class OuvinteInterno{
+
+    }
 }

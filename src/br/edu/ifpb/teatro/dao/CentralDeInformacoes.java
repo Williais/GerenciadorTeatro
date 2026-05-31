@@ -1,5 +1,6 @@
 package br.edu.ifpb.teatro.dao;
 
+import br.edu.ifpb.teatro.exception.*;
 import br.edu.ifpb.teatro.model.ADM;
 import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
@@ -47,7 +48,7 @@ public class CentralDeInformacoes {
         this.todasAsPessoas = todasAsPessoas;
     }
 
-    public void validarHorarioLocacao(LocalDate data, LocalTime inicioPeca, LocalTime fimPeca) throws Exception {
+    public void validarHorarioLocacao(LocalDate data, LocalTime inicioPeca, LocalTime fimPeca) throws HorarioForaDoTurnoPermitidoException, HorarioIndisponivelException {
 
         LocalTime inicioReal = inicioPeca.minusHours(1);
         LocalTime fimReal = fimPeca.plusHours(1);
@@ -57,24 +58,28 @@ public class CentralDeInformacoes {
         boolean isNoite = !inicioReal.isBefore(LocalTime.of(19, 0)) && !fimReal.isAfter(LocalTime.of(23, 0));
 
         if (!isManha && !isTarde && !isNoite) {
-            throw new IllegalArgumentException("O horário (" + inicioReal + " as " + fimReal + ") ultrapassa os limites de um único turno permitido.");
+            throw new HorarioForaDoTurnoPermitidoException();
         }
 
         for (PropostaDeAluguel proposta : todasAsPropostas) {
             if (proposta.getDataEvento().equals(data)) {
                 if (inicioReal.isBefore(proposta.getHoraFimLocacao()) && fimReal.isAfter(proposta.getHoraInicioLocacao())) {
-                    throw new Exception("horario indisponovel! conflita com a peça: " + proposta.getNomeDaPeca());
+                    throw new HorarioIndisponivelException();
                 }
             }
         }
     }
 
-    public boolean adicionarPessoa(Pessoa p){
+    public void adicionarPessoa(Pessoa p) throws PessoaJaCadastradaException {
+
         if(recuperarPessoaPorCPF(p.getCpf()) != null){
-            return false;
+
+            throw new PessoaJaCadastradaException();
+
         }
+
         todasAsPessoas.add(p);
-        return true;
+
     }
 
     public Pessoa recuperarPessoaPorCPF(String cpf){
@@ -86,12 +91,16 @@ public class CentralDeInformacoes {
         return null;
     }
 
-    public boolean adicionarProposta(PropostaDeAluguel p){
+    public void adicionarProposta(PropostaDeAluguel p) throws PropostaJaCadastradaException {
+
         if(recuperarPropostaPorId(p.getId()) != null){
-            return false;
+
+            throw  new PropostaJaCadastradaException();
+
         }
+
         todasAsPropostas.add(p);
-        return true;
+
     }
 
     public void adicionarRegra(RegraDePreco novaRegra) {
@@ -114,9 +123,12 @@ public class CentralDeInformacoes {
         return null;
     }
 
-    public List<PropostaDeAluguel> recuperarPropostasDeUmaPessoa(String cpf){
+    public List<PropostaDeAluguel> recuperarPropostasDeUmaPessoa (String cpf){
+
         if(recuperarPessoaPorCPF(cpf) == null){
+
             return null;
+
         }
 
         List<PropostaDeAluguel> encontrado = new ArrayList<>();
@@ -128,36 +140,43 @@ public class CentralDeInformacoes {
         return encontrado;
     }
 
-    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd){
-        try {
-            if (evento == null || comprador == null || qtd <= 0) {
-                throw new RuntimeException("Não foi possivel acessar os dados solicitados");
-            }
+    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd) throws DadosCompraInvalidosException, PessoaJaCadastradaException{
 
-            if (recuperarPessoaPorCPF(comprador.getCpf()) == null){
-                adicionarPessoa(comprador);
-            }
+        if (evento == null || comprador == null || qtd <= 0) {
 
-            Ingresso ingresso = new Ingresso(comprador, evento, qtd);
-            todosOsIngressos.add(ingresso);
+            throw new DadosCompraInvalidosException();
 
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+
+        if (recuperarPessoaPorCPF(comprador.getCpf()) == null){
+
+            adicionarPessoa(comprador);
+
+        }
+
+        Ingresso ingresso = new Ingresso(comprador, evento, qtd);
+
+        todosOsIngressos.add(ingresso);
+
+        return true;
+
     }
 
     public List<Ingresso> gerarListaDeIngressos(long id){
+
         List<Ingresso> ingressos = new ArrayList<>();
-        try{
+
             for (Ingresso ingresso : todosOsIngressos){
+
                 if (ingresso.getId() == id){
+
                     ingressos.add(ingresso);
+
                 }
+
             }
-            return ingressos;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+        return ingressos;
+
     }
 }

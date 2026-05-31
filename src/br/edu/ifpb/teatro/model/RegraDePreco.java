@@ -8,7 +8,7 @@ import java.time.LocalTime;
 //se um campo for nulo a regra vale para todos
 //Ex: Se diaDaSemana for NULL vale para a semana toda.
 
-public class RegraDePreco {
+public class RegraDePreco{
 
     private long id;
     private float valorHora;
