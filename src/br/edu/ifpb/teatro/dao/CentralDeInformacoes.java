@@ -99,6 +99,9 @@ public class CentralDeInformacoes {
     }
 
     public List<RegraDePreco> getTodasAsRegras() {
+        if (todasAsRegras == null) {
+            todasAsRegras = new ArrayList<>();
+        }
         return todasAsRegras;
     }
 

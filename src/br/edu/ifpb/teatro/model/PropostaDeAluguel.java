@@ -1,12 +1,11 @@
 package br.edu.ifpb.teatro.model;
 
 import br.edu.ifpb.teatro.enums.StatusProposta;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class PropostaDeAluguel implements Serializable {
+public class PropostaDeAluguel  {
 
     private long id;
     private LocalDate dataEvento;
