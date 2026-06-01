@@ -13,6 +13,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,20 +179,23 @@ public class Aluguel extends JPanel {
         btnSalvarAlteracoes.setForeground(Color.WHITE);
         btnSalvarAlteracoes.setEnabled(false);
 
-        btnSalvarAlteracoes.addActionListener(e -> {
-            if (propostaSelecionada != null) {
+        btnSalvarAlteracoes.addActionListener(new ActionListener() {
 
-                String novoStatusStr = cbDetalheStatus.getSelectedItem().toString();
+            public void actionPerformed(ActionEvent e) {
+                if (propostaSelecionada != null) {
 
-                StatusProposta novoStatus = StatusProposta.valueOf(novoStatusStr);
+                    String novoStatusStr = cbDetalheStatus.getSelectedItem().toString();
 
-                propostaSelecionada.setStatus(novoStatus);
+                    StatusProposta novoStatus = StatusProposta.valueOf(novoStatusStr);
 
-                Persistencia persistencia = new Persistencia();
-                persistencia.salvarCentral(central, "central.xml");
+                    propostaSelecionada.setStatus(novoStatus);
 
-                JOptionPane.showMessageDialog(this, "Status atualizado com sucesso!");
-                atualizarTabela();
+                    Persistencia persistencia = new Persistencia();
+                    persistencia.salvarCentral(central, "central.xml");
+
+                    JOptionPane.showMessageDialog(null, "Status atualizado com sucesso!");
+                    atualizarTabela();
+                }
             }
         });
 

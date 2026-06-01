@@ -8,9 +8,11 @@ public class Ingresso {
     private PropostaDeAluguel evento;
     private int quantidade;
     private LocalDate dataEmissao;
+    private float valorIngresso;
 
-    public Ingresso(Pessoa comprador, PropostaDeAluguel evento, int quantidade) {
+    public Ingresso(Pessoa comprador, PropostaDeAluguel evento, int quantidade, float valorIngresso) {
         this.comprador = comprador;
+        this.valorIngresso = valorIngresso;
         this.evento = evento;
         this.quantidade = quantidade;
     }
@@ -47,4 +49,11 @@ public class Ingresso {
         return dataEmissao;
     }
 
+    public float getValorIngresso() {
+        return valorIngresso;
+    }
+
+    public void setValorIngresso(float valorIngresso) {
+        this.valorIngresso = valorIngresso;
+    }
 }

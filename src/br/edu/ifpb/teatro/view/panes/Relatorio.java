@@ -1,11 +1,18 @@
 package br.edu.ifpb.teatro.view.panes;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
+import br.edu.ifpb.teatro.model.Ingresso;
+import br.edu.ifpb.teatro.model.PropostaDeAluguel;
+import br.edu.ifpb.teatro.util.GeradorDeContratos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static br.edu.ifpb.teatro.view.TelaHome.*;
 
@@ -32,6 +39,8 @@ public class Relatorio extends JPanel {
 
         this.add(PainelParametros(), BorderLayout.WEST);
         this.add(PainelDashboard(), BorderLayout.CENTER);
+
+        FiltroDeEventos();
     }
 
     private JPanel PainelParametros() {
@@ -81,7 +90,7 @@ public class Relatorio extends JPanel {
         painelBotoes.setOpaque(false);
 
         btnGerarPDF = new JButton("Gerar Relatorio em PDF");
-        btnGerarPDF.setBackground(new Color(150, 0, 0));
+        btnGerarPDF.setBackground(ACCENT_COLOR);
         btnGerarPDF.setForeground(Color.WHITE);
         btnGerarPDF.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnGerarPDF.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
@@ -89,8 +98,82 @@ public class Relatorio extends JPanel {
 
         btnAcaoSecundaria = new JButton("Atualizar Dashboard");
         btnAcaoSecundaria.setBackground(new Color(85, 139, 47));
+        btnAcaoSecundaria.setForeground(Color.WHITE);
+        btnAcaoSecundaria.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnAcaoSecundaria.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnAcaoSecundaria.setFocusPainted(false);
+
+        btnAcaoSecundaria.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate dataInicioReal = LocalDate.parse(txtDataInicio.getText(), formatador);
+                    LocalDate dataFimReal = LocalDate.parse(txtDataFim.getText(), formatador);
+                    String eventoSelecionado = cbFiltroEvento.getSelectedItem().toString();
+
+                    int totalEventos = 0;
+                    int totalIngressos = 0;
+                    float receitaTotal = 0.0f;
+
+                    modeloTabela.setRowCount(0);
+
+                    for(PropostaDeAluguel p : central.getTodasAsPropostas()) {
+
+                        if (p.getDataEvento().isBefore(dataInicioReal) || p.getDataEvento().isAfter(dataFimReal)) {
+                            continue;
+                        }
+
+                        if (!eventoSelecionado.equals("Todos os Eventos") && !p.getNomeDaPeca().equals(eventoSelecionado)) {
+                            continue;
+                        }
+
+                        if(p.getStatus().name().equals("ENCERRADO")) {
+                            totalEventos++;
+                        }
+
+                        int ingressosDestaPeca = 0;
+                        float receitaDestaPeca = 0.0f;
+
+                        for(Ingresso i : central.gerarListaDeIngressos(p.getId())) {
+                            ingressosDestaPeca += i.getQuantidade();
+                            receitaDestaPeca += i.getQuantidade() * i.getValorIngresso();
+                        }
+
+                        totalIngressos += ingressosDestaPeca;
+                        receitaTotal += receitaDestaPeca;
+
+                        Object[] linha = {p.getDataEvento() + " - " + p.getNomeDaPeca(), ingressosDestaPeca, "R$ " + receitaDestaPeca, p.getStatus().name()};
+                        modeloTabela.addRow(linha);
+                    }
+
+                    lblValorPecas.setText(totalEventos + " Peças");
+                    lblValorIngressos.setText(String.valueOf(totalIngressos));
+                    lblValorReceita.setText("R$ " + receitaTotal);
+
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex); // lembra de alterar aq, pedro!!!!!!!!!!!!!!!!!
+                }
+            }
+        });
+
+        btnGerarPDF.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String inicio = txtDataInicio.getText();
+                String fim = txtDataFim.getText();
+                String receita = lblValorReceita.getText();
+                String ingressos = lblValorIngressos.getText();
+                String pecas = lblValorPecas.getText();
+
+                try{
+                    GeradorDeContratos.gerarRelatorioFinanceiro(inicio, fim, receita, ingressos, pecas, modeloTabela);
+
+                    JOptionPane.showMessageDialog(null, "Relatorio gerado com sucesso");
+
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex); // pedro, lembra de alterar aq tambem!!!!!!!!!!!!!!!!!
+                }
+            }
+        });
 
         painelBotoes.add(btnGerarPDF);
         painelBotoes.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -110,7 +193,7 @@ public class Relatorio extends JPanel {
         painelCards.setPreferredSize(new Dimension(0, 100));
 
         lblValorReceita = CardIndicador(painelCards, "Receita Bruta", "R$ 0,00", new Color(46, 204, 113));
-        lblValorIngressos = CardIndicador(painelCards, "Ingressos Emitidos", "0", new Color(53, 132, 228));
+        lblValorIngressos = CardIndicador(painelCards, "Ingressos Emitidos", "0", ACCENT_COLOR );
         lblValorPecas = CardIndicador(painelCards, "Eventos Realizados", "0 Peças", Color.WHITE);
 
         painel.add(painelCards, BorderLayout.NORTH);
@@ -177,5 +260,14 @@ public class Relatorio extends JPanel {
         container.add(card);
 
         return lblValor;
+    }
+
+    private void FiltroDeEventos() {
+        cbFiltroEvento.removeAllItems();
+        cbFiltroEvento.addItem("Todos os Eventos");
+
+        for(PropostaDeAluguel p : central.getTodasAsPropostas()){
+            cbFiltroEvento.addItem(p.getNomeDaPeca());
+        }
     }
 }
