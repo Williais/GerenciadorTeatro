@@ -13,10 +13,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +51,11 @@ public class VendaIngresso extends JPanel {
         this.add(painelCarrinho(), BorderLayout.CENTER);
         this.add(painelComprador(), BorderLayout.WEST);
         carregarEventos();
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentShown(ComponentEvent e) {
+                carregarEventos();
+            }
+        });
     }
 
     public JPanel painelCarrinho() {
@@ -128,7 +130,9 @@ public class VendaIngresso extends JPanel {
                 Object[] linha = {
                         eventoSelecionado.getNomeDaPeca() + " (" + cbIngressos.getSelectedItem() + ")",
                         qtd,
-                        subTotal
+                        subTotal,
+                        eventoSelecionado.getId(),
+                        cbIngressos.getSelectedItem().toString()
                 };
                 modeloCarrinho.addRow(linha);
                 atualizarTotalCarrinho();
@@ -147,7 +151,7 @@ public class VendaIngresso extends JPanel {
         painelSelecao.add(painelEvento);
         painelSelecao.add(painelIngresso);
 
-        String[] coluna = {"Ingresso", "Quantidade", "Sub-Total"};
+        String[] coluna = {"Ingresso", "Quantidade", "Sub-Total", "ID_Evento", "Tipo_Ingresso"};
         modeloCarrinho = new DefaultTableModel(coluna, 0);
         tabelaIngressos = new JTable(modeloCarrinho);
 
@@ -192,6 +196,7 @@ public class VendaIngresso extends JPanel {
         txtNome = adicionarCampoFormulario(formComprador, "Nome");
         txtEmail = adicionarCampoFormulario(formComprador, "E-mail");
         txtDataNascimento = adicionarCampoFormulario(formComprador, "Data de Nascimento");
+        txtTelefone = adicionarCampoFormulario(formComprador, "Telefone");
 
         JLabel lblSexo = new JLabel("Sexo");
         lblSexo.setForeground(Color.LIGHT_GRAY);

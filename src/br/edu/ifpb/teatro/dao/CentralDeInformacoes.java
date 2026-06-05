@@ -37,6 +37,9 @@ public class CentralDeInformacoes {
     }
 
     public List<Ingresso> getIngresso() {
+        if (this.todosOsIngressos == null) {
+            this.todosOsIngressos = new ArrayList<>();
+        }
         return todosOsIngressos;
     }
 
@@ -158,12 +161,16 @@ public class CentralDeInformacoes {
 
         todosOsIngressos.add(ingresso);
 
+        getIngresso().add(ingresso);
         return true;
 
     }
 
     public List<Ingresso> gerarListaDeIngressos(long id){
 
+        if (this.todosOsIngressos == null) {
+            this.todosOsIngressos = new ArrayList<>();
+        }
         List<Ingresso> ingressos = new ArrayList<>();
 
             for (Ingresso ingresso : todosOsIngressos){
@@ -178,5 +185,12 @@ public class CentralDeInformacoes {
 
         return ingressos;
 
+    }
+
+    public List<Ingresso> gerarListaDeIngressos(){
+        if (this.todosOsIngressos == null) {
+            this.todosOsIngressos = new ArrayList<>();
+        }
+        return this.todosOsIngressos;
     }
 }
