@@ -140,7 +140,7 @@ public class CentralDeInformacoes {
         return encontrado;
     }
 
-    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd) throws DadosCompraInvalidosException, PessoaJaCadastradaException{
+    public boolean realizarCompraDeIngresso(PropostaDeAluguel evento, Pessoa comprador, int qtd, float valor, String tipo) throws DadosCompraInvalidosException, PessoaJaCadastradaException{
 
         if (evento == null || comprador == null || qtd <= 0) {
 
@@ -154,7 +154,7 @@ public class CentralDeInformacoes {
 
         }
 
-        Ingresso ingresso = new Ingresso(comprador, evento, qtd);
+        Ingresso ingresso = new Ingresso(comprador, evento, qtd, valor, tipo);
 
         todosOsIngressos.add(ingresso);
 

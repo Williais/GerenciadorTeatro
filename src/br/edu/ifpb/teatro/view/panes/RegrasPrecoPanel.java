@@ -11,11 +11,14 @@ import java.util.List;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import br.edu.ifpb.teatro.dao.Persistencia;
+import br.edu.ifpb.teatro.util.ConversaoDiaSemana;
 
+import static br.edu.ifpb.teatro.util.ConversaoDiaSemana.converterDia;
 import static br.edu.ifpb.teatro.view.TelaHome.*;
 
 public class RegrasPrecoPanel extends JPanel {
     private CentralDeInformacoes central;
+    private RegraDePreco regraEmEdicao = null;
 
     private JTextField txtNomeRegra;
     private JTextField txtValorBase;
@@ -24,6 +27,7 @@ public class RegrasPrecoPanel extends JPanel {
     private JComboBox<String> cbMes;
     private JTextField txtHoraInicio;
     private JTextField txtHoraFim;
+    private JButton btnSalvar;
 
     private JTable tabelaRegras;
     private DefaultTableModel modelo;
@@ -105,44 +109,74 @@ public class RegrasPrecoPanel extends JPanel {
             limparCampos();
         });
 
-        JButton btnSalvar = new JButton("Salvar Regra");
+        btnSalvar = new JButton("Salvar Regra");
         btnSalvar.setBackground(new Color(46, 204, 113));
         btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);
+
         btnSalvar.addActionListener(e -> {
 
-            float valor = Float.parseFloat(txtValorBase.getText().replace(",", "."));
-            RegraDePreco novaRegra = new RegraDePreco(valor);
+            if(regraEmEdicao == null){
+                float valor = Float.parseFloat(txtValorBase.getText().replace(",", "."));
+                RegraDePreco novaRegra = new RegraDePreco(valor);
 
-            String diaStr = (String) cbDiaSemana.getSelectedItem();
-            novaRegra.setDiaDaSemana(converterDia(diaStr));
+                String diaStr = (String) cbDiaSemana.getSelectedItem();
+                novaRegra.setDiaDaSemana(converterDia(diaStr));
 
-            int mesIndex = cbMes.getSelectedIndex();
-            novaRegra.setMes(mesIndex == 0 ? null : mesIndex);
+                int mesIndex = cbMes.getSelectedIndex();
+                novaRegra.setMes(mesIndex == 0 ? null : mesIndex);
 
-            String turno = (String) cbTurno.getSelectedItem();
-            novaRegra.setTurno(turno.equals("Qualquer Turno") ? null : turno);
+                String turno = (String) cbTurno.getSelectedItem();
+                novaRegra.setTurno(turno.equals("Qualquer Turno") ? null : turno);
 
-            String hIn = txtHoraInicio.getText().trim();
-            String hFim = txtHoraFim.getText().trim();
+                String hIn = txtHoraInicio.getText().trim();
+                String hFim = txtHoraFim.getText().trim();
 
-            if (!hIn.isEmpty() && !hFim.isEmpty()) {
-                novaRegra.setHoraInicio(LocalTime.parse(hIn));
-                novaRegra.setHoraFim(LocalTime.parse(hFim));
-            } else if (!hIn.isEmpty() || !hFim.isEmpty()) {
-                throw new RuntimeException("Horário incompleto: preencha Início e Fim.");
+                if (!hIn.isEmpty() && !hFim.isEmpty()) {
+                    novaRegra.setHoraInicio(LocalTime.parse(hIn));
+                    novaRegra.setHoraFim(LocalTime.parse(hFim));
+                } else if (!hIn.isEmpty() || !hFim.isEmpty()) {
+                    throw new RuntimeException("Horário incompleto: preencha Início e Fim.");
+                }
+
+                central.getTodasAsRegras().add(novaRegra);
+                Persistencia p = new Persistencia();
+                p.salvarCentral(central, "central.xml");
+
             }
+            else{
+                String diaStr = (String) cbDiaSemana.getSelectedItem();
+                regraEmEdicao.setDiaDaSemana(ConversaoDiaSemana.converterDia(diaStr));
 
-            central.getTodasAsRegras().add(novaRegra);
-            Persistencia p = new Persistencia();
-            p.salvarCentral(central, "central.xml");
+                regraEmEdicao.setValorHora(Float.parseFloat(txtValorBase.getText().replace(",", ".")));
+
+                String turno = (String) cbTurno.getSelectedItem();
+                regraEmEdicao.setTurno(turno.equals("Qualquer Turno") ? null : turno);
+
+                String hIn = txtHoraInicio.getText().trim();
+                String hFim = txtHoraFim.getText().trim();
+
+                if (!hIn.isEmpty() && !hFim.isEmpty()) {
+                    regraEmEdicao.setHoraInicio(LocalTime.parse(hIn));
+                    regraEmEdicao.setHoraFim(LocalTime.parse(hFim));
+                } else if (!hIn.isEmpty() || !hFim.isEmpty()) {
+                    throw new RuntimeException("Horário incompleto: preencha Início e Fim.");
+                }else {
+                    regraEmEdicao.setHoraInicio(null);
+                    regraEmEdicao.setHoraFim(null);
+                }
+
+                int mesIndex = cbMes.getSelectedIndex();
+                regraEmEdicao.setMes(mesIndex == 0 ? null : mesIndex);
+
+                Persistencia p = new Persistencia();
+                p.salvarCentral(central, "central.xml");
+            }
 
             JOptionPane.showMessageDialog(this, "Regra salva com sucesso!");
             atualizarTabela();
             limparCampos();
         });
-
-
 
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnSalvar);
@@ -165,6 +199,22 @@ public class RegrasPrecoPanel extends JPanel {
         String[] colunas = {"ID", "Dia", "Turno", "Mês", "Valor (R$)"};
         modelo = new DefaultTableModel(colunas, 0);
         tabelaRegras = new JTable(modelo);
+
+        tabelaRegras.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tabelaRegras.getSelectedRow() != -1) {
+                int linha = tabelaRegras.getSelectedRow();
+                long id = (long) modelo.getValueAt(linha, 0);
+
+                RegraDePreco regra = central.getTodasAsRegras().stream()
+                        .filter(r -> r.getId() == id)
+                        .findFirst()
+                        .orElse(null);
+
+                if (regra != null) {
+                    preencherFormularioParaEdicao(regra);
+                }
+            }
+        });
         atualizarTabela();
         JScrollPane scroll = new JScrollPane(tabelaRegras);
         scroll.getViewport().setBackground(PANEL_COLOR);
@@ -173,7 +223,6 @@ public class RegrasPrecoPanel extends JPanel {
         JPanel painelAcoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         painelAcoes.setOpaque(false);
 
-        JButton btnEditar = new JButton("Editar Regra"); // falta fazer
         JButton btnExcluir = new JButton("Excluir");
         btnExcluir.setBackground(new Color(200, 50, 50));
         btnExcluir.setForeground(Color.WHITE);
@@ -185,7 +234,6 @@ public class RegrasPrecoPanel extends JPanel {
                 return;
             }
 
-            // Pegando o ID que ta na primeira coluna indice 0
             long id = (long) modelo.getValueAt(linha, 0);
 
             int confirm = JOptionPane.showConfirmDialog(this,
@@ -194,7 +242,7 @@ public class RegrasPrecoPanel extends JPanel {
                     JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                central.getTodasAsRegras().removeIf(r -> r.getId() == id); //ondeestaeste metodo removeif como t afuncionando
+                central.getTodasAsRegras().removeIf(r -> r.getId() == id);
                 Persistencia p = new Persistencia();
                 p.salvarCentral(central, "central.xml");
                 atualizarTabela();
@@ -203,7 +251,6 @@ public class RegrasPrecoPanel extends JPanel {
             }
         });
 
-        painelAcoes.add(btnEditar);
         painelAcoes.add(btnExcluir);
 
         painel.add(painelAcoes, BorderLayout.SOUTH);
@@ -211,6 +258,38 @@ public class RegrasPrecoPanel extends JPanel {
         return painel;
     }
 
+    private void preencherFormularioParaEdicao(RegraDePreco regra) {
+        this.regraEmEdicao = regra;
+
+        txtValorBase.setText(String.format("%.2f", regra.getValorHora()).replace(".", ","));
+
+        txtHoraInicio.setText(regra.getHoraInicio() != null ? regra.getHoraInicio().toString() : "");
+        txtHoraFim.setText(regra.getHoraFim() != null ? regra.getHoraFim().toString() : "");
+
+        if (regra.getDiaDaSemana() == null) {
+            cbDiaSemana.setSelectedIndex(0);
+        } else {
+            switch (regra.getDiaDaSemana()) {
+                case MONDAY: cbDiaSemana.setSelectedItem("Segunda"); break;
+                case TUESDAY: cbDiaSemana.setSelectedItem("Terça"); break;
+                case WEDNESDAY: cbDiaSemana.setSelectedItem("Quarta"); break;
+                case THURSDAY: cbDiaSemana.setSelectedItem("Quinta"); break;
+                case FRIDAY: cbDiaSemana.setSelectedItem("Sexta"); break;
+                case SATURDAY: cbDiaSemana.setSelectedItem("Sábado"); break;
+                case SUNDAY: cbDiaSemana.setSelectedItem("Domingo"); break;
+            }
+        }
+
+        cbMes.setSelectedIndex(regra.getMes() == null ? 0 : regra.getMes());
+
+        if (regra.getTurno() == null) {
+            cbTurno.setSelectedIndex(0);
+        } else {
+            cbTurno.setSelectedItem(regra.getTurno());
+        }
+
+        btnSalvar.setText("Alterar");
+    }
 
     private JTextField adicionarCampoTexto(JPanel container, String nomeLabel) {
         JLabel label = new JLabel(nomeLabel);
@@ -245,18 +324,7 @@ public class RegrasPrecoPanel extends JPanel {
 
         return comboBox;
     }
-    private DayOfWeek converterDia(String dia) {
-        switch (dia) {
-            case "Segunda": return DayOfWeek.MONDAY;
-            case "Terça":   return DayOfWeek.TUESDAY;
-            case "Quarta":  return DayOfWeek.WEDNESDAY;
-            case "Quinta":  return DayOfWeek.THURSDAY;
-            case "Sexta":   return DayOfWeek.FRIDAY;
-            case "Sábado":  return DayOfWeek.SATURDAY;
-            case "Domingo": return DayOfWeek.SUNDAY;
-            default: return null;
-        }
-    }
+
     private void limparCampos() {
         txtNomeRegra.setText("");
         txtValorBase.setText("");
@@ -265,13 +333,16 @@ public class RegrasPrecoPanel extends JPanel {
         cbDiaSemana.setSelectedIndex(0);
         cbTurno.setSelectedIndex(0);
         cbMes.setSelectedIndex(0);
+
+        btnSalvar.setText("Salvar Regra");
+
+        regraEmEdicao = null;
     }
     void atualizarTabela() {
-        modelo.setRowCount(0); //
+        modelo.setRowCount(0);
 
         List<RegraDePreco> regras = central.getTodasAsRegras();
 
-        // atualizacao das regras na tabela
         if (regras != null) {
             for (RegraDePreco r : regras) {
                 Object[] linha = {

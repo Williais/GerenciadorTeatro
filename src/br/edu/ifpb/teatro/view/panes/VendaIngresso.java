@@ -1,12 +1,24 @@
 package br.edu.ifpb.teatro.view.panes;
 
 import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
+import br.edu.ifpb.teatro.dao.Persistencia;
 import br.edu.ifpb.teatro.enums.PessoaSexo;
+import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
+import br.edu.ifpb.teatro.model.PropostaDeAluguel;
+import br.edu.ifpb.teatro.security.ValidadorDesconto;
+import br.edu.ifpb.teatro.util.GeradorDeIngressos;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import static br.edu.ifpb.teatro.view.TelaHome.BG_COLOR;
 import static br.edu.ifpb.teatro.view.TelaHome.PANEL_COLOR;
@@ -28,6 +40,7 @@ public class VendaIngresso extends JPanel {
     private JComboBox<String> cbPagamento;
 
     private JTable tabelaIngressos;
+    private DefaultTableModel modeloCarrinho;
 
     private JSpinner spnQtd;
 
@@ -40,6 +53,7 @@ public class VendaIngresso extends JPanel {
 
         this.add(painelCarrinho(), BorderLayout.CENTER);
         this.add(painelComprador(), BorderLayout.WEST);
+        carregarEventos();
     }
 
     public JPanel painelCarrinho() {
@@ -87,6 +101,39 @@ public class VendaIngresso extends JPanel {
         btnIngresso.setBackground(new Color(90, 90, 90));
         btnIngresso.setForeground(Color.WHITE);
         btnIngresso.setFocusPainted(false);
+        btnIngresso.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int indexEvento = cbEventos.getSelectedIndex();
+                int indexTipo = cbIngressos.getSelectedIndex();
+
+                if (indexEvento == 0 || indexTipo == 0) {
+                    JOptionPane.showMessageDialog(null, "Selecione o evento e o tipo de ingresso!");
+                    return;
+                }
+
+                PropostaDeAluguel eventoSelecionado = centralDeInformacoes.getTodasAsPropostas().stream()
+                        .filter(p -> p.getStatus().name().equals("CONTRATADO"))
+                        .toList()
+                        .get(indexEvento - 1);
+
+                int qtd = (int) spnQtd.getValue();
+                float precoBase = eventoSelecionado.getPrecoDoIngresso();
+
+                if (cbIngressos.getSelectedItem().toString().equals("Meia")) {
+                    precoBase = precoBase / 2;
+                }
+
+                float subTotal = precoBase * qtd;
+
+                Object[] linha = {
+                        eventoSelecionado.getNomeDaPeca() + " (" + cbIngressos.getSelectedItem() + ")",
+                        qtd,
+                        subTotal
+                };
+                modeloCarrinho.addRow(linha);
+                atualizarTotalCarrinho();
+            }
+        });
 
         JPanel painelBotao = new JPanel(new BorderLayout());
         painelBotao.setOpaque(false);
@@ -101,9 +148,15 @@ public class VendaIngresso extends JPanel {
         painelSelecao.add(painelIngresso);
 
         String[] coluna = {"Ingresso", "Quantidade", "Sub-Total"};
-        Object[][] dados = {};
+        modeloCarrinho = new DefaultTableModel(coluna, 0);
+        tabelaIngressos = new JTable(modeloCarrinho);
 
-        tabelaIngressos = new JTable(dados, coluna);
+        tabelaIngressos.getColumnModel().getColumn(3).setMinWidth(0);
+        tabelaIngressos.getColumnModel().getColumn(3).setMaxWidth(0);
+        tabelaIngressos.getColumnModel().getColumn(3).setWidth(0);
+        tabelaIngressos.getColumnModel().getColumn(4).setMinWidth(0);
+        tabelaIngressos.getColumnModel().getColumn(4).setMaxWidth(0);
+        tabelaIngressos.getColumnModel().getColumn(4).setWidth(0);
 
         JScrollPane scrollPane = new JScrollPane(tabelaIngressos);
         scrollPane.getViewport().setBackground(PANEL_COLOR);
@@ -134,9 +187,22 @@ public class VendaIngresso extends JPanel {
         formComprador.setOpaque(false);
 
         txtCPF = adicionarCampoFormulario(formComprador, "CPF");
+        txtCPF.addFocusListener(new OuvinteFocoCpf());
+
         txtNome = adicionarCampoFormulario(formComprador, "Nome");
         txtEmail = adicionarCampoFormulario(formComprador, "E-mail");
         txtDataNascimento = adicionarCampoFormulario(formComprador, "Data de Nascimento");
+
+        JLabel lblSexo = new JLabel("Sexo");
+        lblSexo.setForeground(Color.LIGHT_GRAY);
+        lblSexo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        cbSexo = new JComboBox<>(PessoaSexo.values());
+        cbSexo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        cbSexo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        formComprador.add(lblSexo);
+        formComprador.add(Box.createRigidArea(new Dimension(0, 5)));
+        formComprador.add(cbSexo);
+        formComprador.add(Box.createRigidArea(new Dimension(0, 15)));
 
         JLabel lblPagamento = new JLabel("Forma de Pagamento");
         lblPagamento.setForeground(Color.LIGHT_GRAY);
@@ -178,6 +244,93 @@ public class VendaIngresso extends JPanel {
         btnConfirmar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnConfirmar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        btnConfirmar.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+
+                if(modeloCarrinho.getRowCount() == 0){
+                    JOptionPane.showMessageDialog(null, "carrinho está vazio");
+                    return;
+                }
+
+                if (txtCPF.getText().trim().isEmpty() || txtNome.getText().trim().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "não pode campos vazios");
+                    return;
+                }
+
+                String cpf = txtCPF.getText();
+                Pessoa p = centralDeInformacoes.recuperarPessoaPorCPF(cpf);
+                Pessoa clienteFinal = null;
+
+                if(p != null){
+                    clienteFinal = p;
+
+                }else{
+                    String nome = txtNome.getText();
+                    String email = txtEmail.getText();
+                    PessoaSexo sexo = (PessoaSexo) cbSexo.getSelectedItem();
+                    String telefone = txtTelefone.getText();
+                    String dataNasc = txtDataNascimento.getText();
+
+                    clienteFinal = new Pessoa(nome, cpf, email, sexo, telefone, dataNasc);
+                    centralDeInformacoes.getTodasAsPessoas().add(clienteFinal);
+                }
+
+                float valorTotalCarrinho = 0.0f;
+                for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
+                    valorTotalCarrinho += (float) modeloCarrinho.getValueAt(i, 2);
+                }
+
+                float valorComDesconto = ValidadorDesconto.calcularDescontoAniversario(clienteFinal, valorTotalCarrinho);
+
+                boolean teveDesconto = false;
+
+                if (valorComDesconto < valorTotalCarrinho) {
+                    JOptionPane.showMessageDialog(null, "Desconto de aniversario aplicado! O total foi de R$ " + valorTotalCarrinho + " para R$ " + valorComDesconto);
+                    teveDesconto = true;
+                }
+
+                List<Ingresso> ingressosDestaVenda = new ArrayList<>();
+
+                for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
+                    int qtd = (int) modeloCarrinho.getValueAt(i, 1);
+                    float subTotal = (float) modeloCarrinho.getValueAt(i, 2);
+                    long idEvento = (long) modeloCarrinho.getValueAt(i, 3);
+                    String tipoIngresso = (String) modeloCarrinho.getValueAt(i, 4);
+
+                    PropostaDeAluguel evento = centralDeInformacoes.recuperarPropostaPorId(idEvento);
+                    float valorUnitario = subTotal / qtd;
+
+                    if (teveDesconto) {
+                        valorUnitario = valorUnitario * 0.90f;
+                    }
+
+                    Ingresso novoIngresso = new Ingresso(clienteFinal, evento, qtd, subTotal, tipoIngresso);
+                    centralDeInformacoes.getIngresso().add(novoIngresso);
+
+
+                    ingressosDestaVenda.add(novoIngresso);
+                    centralDeInformacoes.getIngresso().add(novoIngresso);
+                }
+
+                Persistencia persistencia = new Persistencia();
+                persistencia.salvarCentral(centralDeInformacoes, "central.xml");
+
+                float valorFinalCobrado = (valorComDesconto < valorTotalCarrinho) ? valorComDesconto : valorTotalCarrinho;
+
+                GeradorDeIngressos.gerarPdfDaVenda(clienteFinal, ingressosDestaVenda, valorFinalCobrado);
+
+                JOptionPane.showMessageDialog(null, "Venda Confirmada");
+
+                modeloCarrinho.setRowCount(0);
+                atualizarTotalCarrinho();
+                cbEventos.setSelectedIndex(0);
+                cbIngressos.setSelectedIndex(0);
+                spnQtd.setValue(1);
+
+            }
+        });
+
         JButton btnLimpar = new JButton("Limpar Carrinho");
         btnLimpar.setBackground(Color.GRAY);
         btnLimpar.setForeground(Color.WHITE);
@@ -186,6 +339,16 @@ public class VendaIngresso extends JPanel {
         btnLimpar.putClientProperty("Component.arc", 10);
         btnLimpar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnLimpar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        btnLimpar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                modeloCarrinho.setRowCount(0);
+                atualizarTotalCarrinho();
+                cbEventos.setSelectedIndex(0);
+                cbIngressos.setSelectedIndex(0);
+                spnQtd.setValue(1);
+            }
+        });
 
         painelRodape.add(linhaTotal);
         painelRodape.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -197,6 +360,7 @@ public class VendaIngresso extends JPanel {
 
         return painel;
     }
+
 
     private JTextField adicionarCampoFormulario(JPanel container, String nomeLabel) {
         JLabel label = new JLabel(nomeLabel);
@@ -215,7 +379,71 @@ public class VendaIngresso extends JPanel {
         return textField;
     }
 
-    private class OuvinteInterno{
+    private void carregarEventos() {
+        cbEventos.removeAllItems();
+        cbEventos.addItem("Selecione Evento");
 
+        for (PropostaDeAluguel p : centralDeInformacoes.getTodasAsPropostas()) {
+            if (p.getStatus().name().equals("CONTRATADO")) {
+                cbEventos.addItem(p.getNomeDaPeca() + " (" + p.getDataEvento() + ")");
+            }
+        }
+
+        cbIngressos.removeAllItems();
+        cbIngressos.addItem("Selecione o Tipo");
+        cbIngressos.addItem("Inteira");
+        cbIngressos.addItem("Meia");
+    }
+
+    private void atualizarTotalCarrinho() {
+        float totalGeral = 0.0f;
+
+        for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
+            float subTotalLinha = (float) modeloCarrinho.getValueAt(i, 2);
+            totalGeral += subTotalLinha;
+        }
+
+        lblTotal.setText(String.format("R$ %.2f", totalGeral));
+    }
+
+    private class OuvinteFocoCpf implements FocusListener {
+        public void focusGained(FocusEvent e) {
+        }
+
+        public void focusLost(FocusEvent e) {
+            String cpf = txtCPF.getText().trim();
+
+            if (cpf.isEmpty()) {
+                return;
+            }
+
+            Pessoa cliente = centralDeInformacoes.recuperarPessoaPorCPF(cpf);
+
+            if (cliente != null) {
+                txtNome.setText(cliente.getNome());
+                txtEmail.setText(cliente.getEmail());
+                txtDataNascimento.setText(cliente.getDataNascimento());
+                if (txtTelefone != null) txtTelefone.setText(cliente.getTelefone());
+                if (cbSexo != null) cbSexo.setSelectedItem(cliente.getSexo());
+
+                txtNome.setEditable(false);
+                txtEmail.setEditable(false);
+                txtDataNascimento.setEditable(false);
+                if (txtTelefone != null) txtTelefone.setEditable(false);
+                if (cbSexo != null) cbSexo.setEnabled(false);
+            } else {
+                txtNome.setText("");
+                txtEmail.setText("");
+                txtDataNascimento.setText("");
+                if (txtTelefone != null) txtTelefone.setText("");
+                if (cbSexo != null) cbSexo.setSelectedIndex(0);
+
+                txtNome.setEditable(true);
+                txtEmail.setEditable(true);
+                txtDataNascimento.setEditable(true);
+                if (txtTelefone != null) txtTelefone.setEditable(true);
+                if (cbSexo != null) cbSexo.setEnabled(true);
+            }
+        }
     }
 }

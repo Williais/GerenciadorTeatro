@@ -3,11 +3,6 @@ package br.edu.ifpb.teatro.model;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-
-//Esta classe representa uma regra de tarifação
-//se um campo for nulo a regra vale para todos
-//Ex: Se diaDaSemana for NULL vale para a semana toda.
-
 public class RegraDePreco{
 
     private long id;

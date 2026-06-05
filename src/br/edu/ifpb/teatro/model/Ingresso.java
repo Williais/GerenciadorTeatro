@@ -9,12 +9,26 @@ public class Ingresso {
     private int quantidade;
     private LocalDate dataEmissao;
     private float valorIngresso;
+    private String tipo;
 
-    public Ingresso(Pessoa comprador, PropostaDeAluguel evento, int quantidade, float valorIngresso) {
+    public Ingresso(Pessoa comprador, PropostaDeAluguel evento, int quantidade, float valorIngresso, String tipo) {
         this.comprador = comprador;
+        this.tipo = tipo;
         this.valorIngresso = valorIngresso;
         this.evento = evento;
         this.quantidade = quantidade;
+        this.dataEmissao = LocalDate.now();
+        this.id = System.currentTimeMillis();
+    }
+
+
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public long getId() {
