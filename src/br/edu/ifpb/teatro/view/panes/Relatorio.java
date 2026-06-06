@@ -4,6 +4,7 @@ import br.edu.ifpb.teatro.dao.CentralDeInformacoes;
 import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.util.GeradorDeContratos;
+import br.edu.ifpb.teatro.util.GeradorDeRelatorio;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import static br.edu.ifpb.teatro.view.TelaHome.*;
 
@@ -74,8 +76,11 @@ public class Relatorio extends JPanel {
         painelDatas.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         painelDatas.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        txtDataInicio = new JTextField("01/01/2025");
-        txtDataFim = new JTextField("31/01/2025");
+        LocalDate hoje = LocalDate.now();
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        txtDataInicio = new JTextField("01/01/2026");
+        txtDataFim = new JTextField(hoje.format(formatador));
         painelDatas.add(txtDataInicio);
         painelDatas.add(txtDataFim);
         form.add(painelDatas);
@@ -106,6 +111,50 @@ public class Relatorio extends JPanel {
         btnAcaoSecundaria.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                String tipoRelatorio = cbTipoRelatorio.getSelectedItem().toString();
+
+                if (tipoRelatorio.equals("Lista de Presença")) {
+                    String pecaSelecionada = cbFiltroEvento.getSelectedItem().toString();
+                    if (pecaSelecionada.equals("Todos os Eventos")){
+                        JOptionPane.showMessageDialog(null, "voce precisa selecionar um evento. não da pra gerar de todos de uma vez");
+                        return;
+                    }
+
+                    String[] colunasPresenca = {"Comprador", "CPF", "Tipo", "Qtd Ingressos"};
+                    modeloTabela.setColumnIdentifiers(colunasPresenca);
+                    modeloTabela.setRowCount(0);
+
+                    int totalIngressosPresenca = 0;
+
+                    PropostaDeAluguel eventoEncontrado = null;
+                    for (PropostaDeAluguel p : central.getTodasAsPropostas()) {
+                        if (p.getNomeDaPeca().equals(pecaSelecionada)) {
+                            eventoEncontrado = p;
+                            break;
+                        }
+                    }
+
+                    if (eventoEncontrado != null) {
+                        for (Ingresso ingresso : central.gerarListaDeIngressos(eventoEncontrado.getId())) {
+
+                            Object[] linha = {
+                                    ingresso.getComprador().getNome(),
+                                    ingresso.getComprador().getCpf(),
+                                    ingresso.getTipo(),
+                                    ingresso.getQuantidade()
+                            };
+                            modeloTabela.addRow(linha);
+
+                            totalIngressosPresenca += ingresso.getQuantidade();
+                        }
+
+                        lblValorPecas.setText("1 Peça");
+                        lblValorIngressos.setText(String.valueOf(totalIngressosPresenca));
+                        lblValorReceita.setText("N/A");
+                    }
+
+                }else{
+
                     DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                     LocalDate dataInicioReal = LocalDate.parse(txtDataInicio.getText(), formatador);
                     LocalDate dataFimReal = LocalDate.parse(txtDataFim.getText(), formatador);
@@ -144,11 +193,15 @@ public class Relatorio extends JPanel {
 
                         Object[] linha = {p.getDataEvento() + " - " + p.getNomeDaPeca(), ingressosDestaPeca, "R$ " + receitaDestaPeca, p.getStatus().name()};
                         modeloTabela.addRow(linha);
+
                     }
 
                     lblValorPecas.setText(totalEventos + " Peças");
                     lblValorIngressos.setText(String.valueOf(totalIngressos));
                     lblValorReceita.setText("R$ " + receitaTotal);
+                }
+
+
 
                 } catch (Exception ex) {
                     throw new RuntimeException(ex); // lembra de alterar aq, pedro!!!!!!!!!!!!!!!!!
@@ -158,19 +211,33 @@ public class Relatorio extends JPanel {
 
         btnGerarPDF.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String inicio = txtDataInicio.getText();
-                String fim = txtDataFim.getText();
-                String receita = lblValorReceita.getText();
-                String ingressos = lblValorIngressos.getText();
-                String pecas = lblValorPecas.getText();
+                String tipoRelatorio = cbTipoRelatorio.getSelectedItem().toString();
 
-                try{
-                    GeradorDeContratos.gerarRelatorioFinanceiro(inicio, fim, receita, ingressos, pecas, modeloTabela);
+                try {
+                    if (tipoRelatorio.equals("Lista de Presença")) {
+                        String pecaSelecionada = cbFiltroEvento.getSelectedItem().toString();
 
-                    JOptionPane.showMessageDialog(null, "Relatorio gerado com sucesso");
+                        if (pecaSelecionada.equals("Todos os Eventos")){
+                            JOptionPane.showMessageDialog(null, "Atualize o dashboard com um evento especifico antes de gerar o PDF da lista de presença.");
+                            return;
+                        }
+
+                        GeradorDeRelatorio.gerarListaDePresenca(pecaSelecionada, modeloTabela);
+                        JOptionPane.showMessageDialog(null, "lista de presença em PDF");
+
+                    } else {
+                        String inicio = txtDataInicio.getText();
+                        String fim = txtDataFim.getText();
+                        String receita = lblValorReceita.getText();
+                        String ingressos = lblValorIngressos.getText();
+                        String pecas = lblValorPecas.getText();
+
+                        GeradorDeRelatorio.gerarRelatorioFinanceiro(inicio, fim, receita, ingressos, pecas, modeloTabela);
+                        JOptionPane.showMessageDialog(null, "Relatorio financeiro exportado para PDF");
+                    }
 
                 } catch (Exception ex) {
-                    throw new RuntimeException(ex); // pedro, lembra de alterar aq tambem!!!!!!!!!!!!!!!!!
+                    JOptionPane.showMessageDialog(null, "erro ao gerar arquivo: " + ex.getMessage());
                 }
             }
         });

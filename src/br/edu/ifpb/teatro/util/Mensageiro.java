@@ -46,10 +46,10 @@ public class Mensageiro {
             message.setContent(pacote);// usado pra colocar o pacote na mensagem
 
             System.out.println("enviando e-mail para " + emailDestinatario);
-            Transport.send(message); // enviando
+            Transport.send(message);
             System.out.println("e-mail enviado com sucesso com o anexo: " + nomeArquivo);
 
-        } catch (Exception erroDeEnvio) { //Mantive o Exception, já supre a necessidade do erro
+        } catch (Exception erroDeEnvio) {
             System.out.println("erro ao tentar enviar o e-mail: " + erroDeEnvio.getMessage());
         }
     }
@@ -69,6 +69,32 @@ public class Mensageiro {
 
         } catch (Exception e) {
             throw new RuntimeException("Falha na rede ao tentar enviar o código: " + e.getMessage());
+        }
+    }
+
+    public static void enviarIngresso(String emailDestinatario, String nomeArquivo){
+        try{
+            Message mensagem = new MimeMessage(conectarServidor());
+            mensagem.setFrom(new InternetAddress("projetofinalpoo@gmail.com"));
+            mensagem.setRecipient(Message.RecipientType.TO, new InternetAddress(emailDestinatario));
+            mensagem.setSubject("Emissão de Ingressos");
+
+            MimeBodyPart texto = new MimeBodyPart();
+            texto.setText("Boa, Meu Nobre! \n\nSegue abaixo o(s) ingressos comprado por vc");
+
+            MimeBodyPart pdf = new MimeBodyPart();
+            File arquivoPDF = new File(nomeArquivo);
+            pdf.attachFile(arquivoPDF);
+
+            Multipart corpo = new MimeMultipart();
+            corpo.addBodyPart(texto);
+            corpo.addBodyPart(pdf);
+
+            mensagem.setContent(corpo);
+
+            Transport.send(mensagem);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

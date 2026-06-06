@@ -7,7 +7,11 @@ import br.edu.ifpb.teatro.model.Ingresso;
 import br.edu.ifpb.teatro.model.Pessoa;
 import br.edu.ifpb.teatro.model.PropostaDeAluguel;
 import br.edu.ifpb.teatro.security.ValidadorDesconto;
+import br.edu.ifpb.teatro.security.ValidadorDocumento;
+import br.edu.ifpb.teatro.util.GeradorDeContratos;
 import br.edu.ifpb.teatro.util.GeradorDeIngressos;
+import br.edu.ifpb.teatro.util.LimpadorCPF;
+import br.edu.ifpb.teatro.util.Mensageiro;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -264,21 +268,27 @@ public class VendaIngresso extends JPanel {
                 }
 
                 String cpf = txtCPF.getText();
-                Pessoa p = centralDeInformacoes.recuperarPessoaPorCPF(cpf);
                 Pessoa clienteFinal = null;
+                try{
 
-                if(p != null){
-                    clienteFinal = p;
+                    ValidadorDocumento.validarCPF(cpf);
+                    Pessoa p = centralDeInformacoes.recuperarPessoaPorCPF(cpf);
 
-                }else{
-                    String nome = txtNome.getText();
-                    String email = txtEmail.getText();
-                    PessoaSexo sexo = (PessoaSexo) cbSexo.getSelectedItem();
-                    String telefone = txtTelefone.getText();
-                    String dataNasc = txtDataNascimento.getText();
+                    if(p != null){
+                        clienteFinal = p;
 
-                    clienteFinal = new Pessoa(nome, cpf, email, sexo, telefone, dataNasc);
-                    centralDeInformacoes.getTodasAsPessoas().add(clienteFinal);
+                    }else{
+                        String nome = txtNome.getText();
+                        String email = txtEmail.getText();
+                        PessoaSexo sexo = (PessoaSexo) cbSexo.getSelectedItem();
+                        String telefone = txtTelefone.getText();
+                        String dataNasc = txtDataNascimento.getText();
+
+                        clienteFinal = new Pessoa(nome, cpf, email, sexo, telefone, dataNasc);
+                        centralDeInformacoes.getTodasAsPessoas().add(clienteFinal);
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
 
                 float valorTotalCarrinho = 0.0f;
@@ -326,6 +336,45 @@ public class VendaIngresso extends JPanel {
                 GeradorDeIngressos.gerarPdfDaVenda(clienteFinal, ingressosDestaVenda, valorFinalCobrado);
 
                 JOptionPane.showMessageDialog(null, "Venda Confirmada");
+
+                int enviar = JOptionPane.showConfirmDialog(null, "Deseja que o ingresso seja enviado para seu e-mail?", "Enviar por email?", JOptionPane.YES_NO_CANCEL_OPTION);
+                if (enviar == JOptionPane.YES_OPTION) {
+
+                    JDialog dialogCarregando = new JDialog();
+                    dialogCarregando.setTitle("Aguarde");
+                    dialogCarregando.setModal(true);
+                    dialogCarregando.setSize(250, 100);
+                    dialogCarregando.setLocationRelativeTo(null);
+                    dialogCarregando.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+                    JPanel painelAguarde = new JPanel(new BorderLayout());
+                    painelAguarde.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+                    painelAguarde.add(new JLabel("Enviando ingressos por e-mail...", SwingConstants.CENTER), BorderLayout.CENTER);
+                    dialogCarregando.add(painelAguarde);
+
+                    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
+                        protected Void doInBackground() throws Exception {
+
+                            Mensageiro.enviarIngresso(txtEmail.getText(), "Ingressos_" + LimpadorCPF.limparCPF(cpf) + ".pdf");
+                            return null;
+                        }
+
+                        protected void done() {
+
+                            dialogCarregando.dispose();
+                            try {
+                                get();
+                                JOptionPane.showMessageDialog(null, "email enviado!");
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(null, "Erro ao enviar email: " + ex.getMessage());
+                            }
+                        }
+                    };
+
+                    worker.execute();
+                    dialogCarregando.setVisible(true);
+                }
 
                 modeloCarrinho.setRowCount(0);
                 atualizarTotalCarrinho();

@@ -16,8 +16,7 @@ public class GeradorDeIngressos {
 
         try {
 
-            String cpfLimpo = comprador.getCpf().replaceAll("[^0-9]", "");
-            String nomeArquivo = "Ingressos_" + cpfLimpo + ".pdf";
+            String nomeArquivo = "Ingressos_" + LimpadorCPF.limparCPF(comprador.getCpf()) + ".pdf";
 
             PdfWriter.getInstance(documento, new FileOutputStream(nomeArquivo));
             documento.open();

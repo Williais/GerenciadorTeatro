@@ -175,7 +175,7 @@ public class CentralDeInformacoes {
 
             for (Ingresso ingresso : todosOsIngressos){
 
-                if (ingresso.getId() == id){
+                if (ingresso.getEvento().getId() == id){
 
                     ingressos.add(ingresso);
 

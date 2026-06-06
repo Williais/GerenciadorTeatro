@@ -59,7 +59,7 @@ public class ModalNovaProposta extends JDialog {
         JPanel painelFormulario = new JPanel(new GridLayout(0, 2, 10, 10));
         painelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        painelFormulario.add(new JLabel("CPF do Artista (Busca Automática):"));
+        painelFormulario.add(new JLabel("CPF do Artista:"));
         painelFormulario.add(txtCpf);
 
         painelFormulario.add(new JLabel("Nome Completo:"));
@@ -72,7 +72,7 @@ public class ModalNovaProposta extends JDialog {
         painelFormulario.add(txtEmail);
 
         painelFormulario.add(new JLabel("Gênero:"));
-        painelFormulario.add(txtGenero); //ALTERAR PARA OPÇÕES
+        painelFormulario.add(txtGenero);
 
         painelFormulario.add(new JLabel("Data de Nascimento (DD/MM/AAAA):"));
         painelFormulario.add(txtDataNascimento);

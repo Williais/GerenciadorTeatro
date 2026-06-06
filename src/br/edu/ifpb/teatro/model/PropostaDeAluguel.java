@@ -17,6 +17,7 @@ public class PropostaDeAluguel  {
     private float precoDoIngresso;
     private Pessoa locatario;
     private StatusProposta status;
+    private LocalDate dataEstendida;
 
     public PropostaDeAluguel(LocalDateTime dataDeCadastro, LocalTime horaInicioLocacao, LocalTime horaFimLocacao,
                              String nomeDaPeca, float valorTotalDoAluguel, float precoDoIngresso, Pessoa locatario, LocalDate dataEvento) {
@@ -30,12 +31,21 @@ public class PropostaDeAluguel  {
         this.locatario = locatario;
         this.status = StatusProposta.EM_CONTRATACAO;
         this.dataEvento = dataEvento;
+
     }
 
     public long getId() { return id; }
 
     public LocalDate getDataEvento() { return dataEvento; }
     public void setDataEvento(LocalDate dataEvento) { this.dataEvento = dataEvento; }
+
+    public LocalDate getDataEstendida() {
+        return dataEstendida;
+    }
+
+    public void setDataEstendida(LocalDate dataEstendida) {
+        this.dataEstendida = dataEstendida;
+    }
 
     public LocalDateTime getDataDeCadastro() { return dataDeCadastro; }
     public void setDataDeCadastro(LocalDateTime dataDeCadastro) { this.dataDeCadastro = dataDeCadastro; }
