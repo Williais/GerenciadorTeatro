@@ -8,7 +8,7 @@ public class CPFInvalidoException extends Exception {
         super(message);
         JOptionPane.showMessageDialog(
                 null,
-                "erro",
+                "CPF Invalido. Coloque um CPF Válido",
                 "Erro", JOptionPane.ERROR_MESSAGE);
     }
 
