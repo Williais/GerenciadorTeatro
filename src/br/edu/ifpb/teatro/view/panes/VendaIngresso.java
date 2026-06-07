@@ -437,7 +437,7 @@ public class VendaIngresso extends JPanel {
         cbEventos.addItem("Selecione Evento");
 
         for (PropostaDeAluguel p : centralDeInformacoes.getTodasAsPropostas()) {
-            if (p.getStatus().name().equals("CONTRATADO")) {
+            if (p.getStatus().name().equals("CONTRATADO") ||p.getStatus().name().equals("CONTRATADO_COM_ALTERACAO")) {
                 cbEventos.addItem(p.getNomeDaPeca() + " (" + p.getDataEvento() + ")");
             }
         }
