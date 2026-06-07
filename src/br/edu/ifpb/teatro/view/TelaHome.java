@@ -33,7 +33,7 @@ public class TelaHome extends JFrame {
         CardLayout layout = new CardLayout();
 
         JPanel painelCentral = new JPanel(layout);
-        painelCentral.add(new DashboardPanel(), "DASHBOARD");
+        painelCentral.add(new DashboardPanel(central), "DASHBOARD");
         painelCentral.add(new RegrasPrecoPanel(central), "REGRAS");
         painelCentral.add(new Aluguel(central), "ALUGUEL");
         painelCentral.add(new Relatorio(central), "RELATORIO");

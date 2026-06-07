@@ -24,12 +24,8 @@ public class Main {
             TelaCadastroAdm telaCadastro = new TelaCadastroAdm(central);
             telaCadastro.setVisible(true);
         }else{
-            TelaHome home = new TelaHome(central);
-            home.setVisible(true);
-
-           //TelaLoginAdm telaLogin = new TelaLoginAdm(central);
-           //telaLogin.setVisible(true);
-
+           TelaLoginAdm telaLogin = new TelaLoginAdm(central);
+           telaLogin.setVisible(true);
         }
 
     }

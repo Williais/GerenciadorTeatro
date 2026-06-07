@@ -59,7 +59,7 @@ public class TelaCadastroAdm extends JFrame {
         cartaoCadastro.add(lblSubtitulo, gbc);
 
 
-        JLabel labelNome = new JLabel("Nome Completo");
+        JLabel labelNome = new JLabel("Primeiro Nome");
         labelNome.setFont(new Font("SansSerif", Font.BOLD, 12));
         gbc.gridy = 2;
         cartaoCadastro.add(labelNome, gbc);

@@ -294,6 +294,7 @@ public class VendaIngresso extends JPanel {
                 float valorTotalCarrinho = 0.0f;
                 for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
                     valorTotalCarrinho += (float) modeloCarrinho.getValueAt(i, 2);
+
                 }
 
                 float valorComDesconto = ValidadorDesconto.calcularDescontoAniversario(clienteFinal, valorTotalCarrinho);
@@ -321,8 +322,6 @@ public class VendaIngresso extends JPanel {
                     }
 
                     Ingresso novoIngresso = new Ingresso(clienteFinal, evento, qtd, subTotal, tipoIngresso);
-                    centralDeInformacoes.getIngresso().add(novoIngresso);
-
 
                     ingressosDestaVenda.add(novoIngresso);
                     centralDeInformacoes.getIngresso().add(novoIngresso);
